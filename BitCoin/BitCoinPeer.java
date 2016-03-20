@@ -1,9 +1,11 @@
 import java.net.*;
 import java.io.*;
 import java.security.*;
+import javax.crypto.*;
+import java.util.Arrays;
 
 public class BitCoinPeer {
-    public static void main(String args[]) {
+    public static void main(String args[]) throws NoSuchAlgorithmException {
         // args give message contents and destination multicast group (e.g.
         // "228.5.6.7")
         MulticastSocket s = null;
@@ -18,18 +20,16 @@ public class BitCoinPeer {
             s.send(messageOut);
 
             // Generate a 1024-bit Digital Signature Algorithm (DSA) key pair
-            try {
-                KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-                keyGen.initialize(1024);
-                KeyPair keypair = keyGen.genKeyPair();
-                PrivateKey privateKey = keypair.getPrivate();
-                System.out.println(privateKey.getEncoded());
-                PublicKey publicKey = keypair.getPublic();
-                System.out.println("PUBLICAAAAAAAAA");
-                System.out.println(publicKey.getEncoded());
-            } catch (NoSuchAlgorithmException e) {
-            }
-
+  
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA");
+            keyGen.initialize(1024);
+            KeyPair keypair = keyGen.genKeyPair();
+            PrivateKey privateKey = keypair.getPrivate();
+            System.out.println(Arrays.toString(privateKey.getEncoded()));
+            PublicKey publicKey = keypair.getPublic();
+            System.out.println("PUBLICAAAAAAAAA");
+            System.out.println(Arrays.toString(publicKey.getEncoded()));
+            
             byte[] buffer = new byte[1000];
             for (int i = 0; i < 4; i++) { // get messages from others in group
                 DatagramPacket messageIn =
