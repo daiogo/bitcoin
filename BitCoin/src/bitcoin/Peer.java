@@ -1,12 +1,26 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package bitcoin;
+
 import java.net.*;
 import java.io.*;
 import java.security.*;
 import javax.crypto.*;
 import java.util.Arrays;
-
-public class BitCoinPeer {
+/**
+ *
+ * @author diego
+ */
+public class Peer {
+    
+    private KeyHolder keyHolder;
+    private VerifySignature verifySignature;
     
     public void start() {
+        
         // args give message contents and destination multicast group (e.g.
         // "228.5.6.7")
         MulticastSocket s = null;
@@ -32,6 +46,5 @@ public class BitCoinPeer {
             if (s != null)
                 s.close();
         }
-    }
-    
+    }    
 }

@@ -1,3 +1,4 @@
+package BitCoin;
 
 public class MainBitCoin {
     public static void main(String args[]) {
