@@ -19,6 +19,19 @@ public class Peer {
     private KeyHolder keyHolder;
     private VerifySignature verifySignature;
     
+    public Peer(){
+        System.out.println("Peer Constructor");
+        keyHolder = new KeyHolder();
+        verifySignature = new VerifySignature();
+    }
+    
+    public void test_signature(){
+        keyHolder.signFile("test_file.txt");
+        verifySignature.verify("publicKey", "sig", "test_file.txt");
+        verifySignature.verify("publicKey", "sig", "test_file2.txt");
+                
+    }
+    
     public void start() {
         
         // args give message contents and destination multicast group (e.g.

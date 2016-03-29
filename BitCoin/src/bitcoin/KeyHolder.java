@@ -21,6 +21,10 @@ public class KeyHolder {
         generateKeys();
     }
     
+    public byte[] getPublicKey(){
+        return publicKey.getEncoded();
+    }
+    
     private void generateKeys(){
         
         /* Generate a DSA signature */
@@ -38,6 +42,7 @@ public class KeyHolder {
             
             /* Save the public key in a file */
             byte[] key = publicKey.getEncoded();
+            System.out.println("Key created!");
             FileOutputStream keyfos = new FileOutputStream("publicKey");
             keyfos.write(key);
 

@@ -16,7 +16,8 @@ public class BitCoin {
      */
     public static void main(String[] args) {
 	Peer peer = new Peer();
-	peer.start();
+	peer.test_signature();
+        //peer.start();
     }
     
 }
