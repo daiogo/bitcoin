@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package bitcoin;
 
 import java.io.*;
@@ -12,7 +7,7 @@ import java.security.spec.*;
  *
  * @author diego
  */
-public class VerifySignature {
+public class SignatureVerifier {
     
     public void verify(String publickeyfile, String signaturefile, String datafile ){
         /* Verify a DSA signature */
