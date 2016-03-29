@@ -17,12 +17,12 @@ import java.util.Arrays;
 public class Peer {
     
     private KeyHolder keyHolder;
-    private VerifySignature verifySignature;
+    private SignatureVerifier verifySignature;
     
     public Peer(){
         System.out.println("Peer Constructor");
         keyHolder = new KeyHolder();
-        verifySignature = new VerifySignature();
+        verifySignature = new SignatureVerifier();
     }
     
     public void test_signature(){
