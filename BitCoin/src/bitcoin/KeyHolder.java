@@ -25,6 +25,10 @@ public class KeyHolder {
         return publicKey.getEncoded();
     }
     
+    public PublicKey getNotEncodedPublicKey(){
+        return publicKey;
+    }
+    
     private void generateKeys(){
         
         /* Generate a DSA signature */

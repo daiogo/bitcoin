@@ -8,6 +8,7 @@ package bitcoin;
 import java.net.*;
 import java.io.*;
 import java.security.*;
+import java.util.ArrayList;
 import javax.crypto.*;
 import java.util.Arrays;
 /**
@@ -15,43 +16,54 @@ import java.util.Arrays;
  * @author diego
  */
 public class Peer {
+    public static final int PORT = 6789;
+    public static final String GROUP_IP = "228.5.6.7";
     
     private KeyHolder keyHolder;
-    private SignatureVerifier verifySignature;
+    private SignatureVerifier verifier;
+    private ArrayList wallets;
+    private Wallet myWallet;
     
-    public Peer(){
+    public Peer(String username){
         System.out.println("Peer Constructor");
-        keyHolder = new KeyHolder();
-        verifySignature = new SignatureVerifier();
+        this.keyHolder = new KeyHolder();
+        this.verifier = new SignatureVerifier();
+        this.wallets = new ArrayList();
+        this.myWallet = new Wallet(username, 100, this.keyHolder.getNotEncodedPublicKey());
     }
     
     public void test_signature(){
         keyHolder.signFile("test_file.txt");
-        verifySignature.verify("publicKey", "sig", "test_file.txt");
-        verifySignature.verify("publicKey", "sig", "test_file2.txt");
-                
+        verifier.verify("publicKey", "sig", "test_file.txt");
+        verifier.verify("publicKey", "sig", "test_file2.txt");
     }
     
     public void start() {
-        
-        // args give message contents and destination multicast group (e.g.
-        // "228.5.6.7")
         MulticastSocket s = null;
+        
         try {
-            InetAddress group = InetAddress.getByName("228.5.6.7");
-            s = new MulticastSocket(6789);
+            // Sets group settings and join multicast group
+            InetAddress group = InetAddress.getByName(GROUP_IP);
+            s = new MulticastSocket(PORT);
             s.joinGroup(group);
+            
+            // Sends message to group
             String string = "Hello";
-            byte[] m = string.getBytes();
-            DatagramPacket messageOut = new DatagramPacket(m, m.length, group, 6789);
+            byte[] helloMsg = string.getBytes();
+            DatagramPacket messageOut = new DatagramPacket(helloMsg, helloMsg.length, group, PORT);
             s.send(messageOut);
-
+            
+            // Sends your wallet to group to construct database
+            
+            // Gets message from group
             byte[] buffer = new byte[1000];
             for (int i = 0; i < 4; i++) { // get messages from others in group
                 DatagramPacket messageIn = new DatagramPacket(buffer, buffer.length);
                 s.receive(messageIn);
                 System.out.println("Received:" + new String(messageIn.getData()));
             }
+            
+            // Exit program
             s.leaveGroup(group);
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());

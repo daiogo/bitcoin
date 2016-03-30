@@ -15,8 +15,9 @@ public class BitCoin {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-	Peer peer = new Peer();
+	Peer peer = new Peer(args[0]);
 	peer.test_signature();
+        peer.start();
         //peer.start();
     }
     
