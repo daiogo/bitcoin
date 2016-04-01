@@ -11,6 +11,7 @@ import java.security.*;
 import java.util.ArrayList;
 import javax.crypto.*;
 import java.util.Arrays;
+import java.util.Scanner;
 /**
  *
  * @author diego
@@ -24,6 +25,10 @@ public class Peer {
     private ArrayList wallets;
     private Wallet myWallet;
     private MessageSender sender;
+    private MessageReceiver receiver;
+    private boolean exit;
+    private Scanner scanner;
+    private String command;
     
     public Peer(String username){
         System.out.println("Peer Constructor");
@@ -31,6 +36,7 @@ public class Peer {
         this.verifier = new SignatureVerifier();
         this.wallets = new ArrayList();
         this.myWallet = new Wallet(username, 100, this.keyHolder.getNotEncodedPublicKey());
+        this.scanner = new Scanner(System.in);
     }
     
     public void test_signature(){
@@ -48,20 +54,29 @@ public class Peer {
             s = new MulticastSocket(PORT);
             s.joinGroup(group);
             
-            // Sends hello message to group
-            //String helloMsg = "hello|" + myWallet.getPublicKey().toString() + "|" + myWallet.getCoins();
-            String helloMsg = "hello|" + "public key" + "|" + myWallet.getCoins();
-            this.sender = new MessageSender(s, helloMsg);
-            sender.start();
+            receiver = new MessageReceiver(s);
+            receiver.start();
             
-            // Sends your wallet to group to construct database
-            
-            // Gets message from group
-            byte[] buffer = new byte[1000];
-            for (int i = 0; i < 4; i++) { // get messages from others in group
-                DatagramPacket messageIn = new DatagramPacket(buffer, buffer.length);
-                s.receive(messageIn);
-                System.out.println("Received:" + new String(messageIn.getData()));
+            while (exit == false) {
+                System.out.println("Please enter you command:");
+                command = scanner.nextLine();
+                switch (command) {
+                    case "exit":
+                        exit = true;
+                        receiver.setExit(exit);
+                        System.out.println("Exiting...");
+                        break;
+                    case "hello":
+                        // Sends hello message to group
+                        //String helloMsg = "hello|" + myWallet.getPublicKey().toString() + "|" + myWallet.getCoins();
+                        String helloMsg = "hello|" + "public key" + "|" + myWallet.getCoins();
+                        this.sender = new MessageSender(s, helloMsg);
+                        sender.start();
+                        break;
+                    default:
+                        System.out.println("ERROR | Command not found");
+                        break;
+                }
             }
             
             // Exit program
@@ -74,4 +89,3 @@ public class Peer {
         }
     }    
 }
-

@@ -62,6 +62,8 @@ public class MessageSender extends Thread {
                     System.out.println("ERROR | Message to be sent doesn't follow messaging protocol");
                     break;
             }
+            socket.leaveGroup(group);
+            socket.close();
         } catch (IOException ex) {
             Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
         }
