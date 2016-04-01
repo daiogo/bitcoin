@@ -9,35 +9,24 @@ import java.security.spec.*;
  */
 public class SignatureVerifier {
     
-    public void verify(String publickeyfile, String signaturefile, String datafile ){
+    public void verify(PublicKey pubKey, byte[] signedFile, String datafile ){
         /* Verify a DSA signature */
-/*
-        if (args.length != 3) {
-            System.out.println("Usage: VerSig publickeyfile signaturefile datafile");
+
+        if(signedFile == null){
+            System.out.println("SignatureVerifier: Signed file is null");
+            return;
         }
-        */
         try{
 
-            /* import encoded public key */
-
-            FileInputStream keyfis = new FileInputStream(publickeyfile);
-            byte[] encKey = new byte[keyfis.available()];  
-            keyfis.read(encKey);
-
-            keyfis.close();
-
-            X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(encKey);
-
-            KeyFactory keyFactory = KeyFactory.getInstance("DSA", "SUN");
-            PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
-
             /* input the signature bytes */
+            /*
             FileInputStream sigfis = new FileInputStream(signaturefile);
             byte[] sigToVerify = new byte[sigfis.available()]; 
             sigfis.read(sigToVerify );
 
             sigfis.close();
-
+            */
+            
             /* create a Signature object and initialize it with the public key */
             Signature sig = Signature.getInstance("SHA1withDSA", "SUN");
             sig.initVerify(pubKey);
@@ -57,7 +46,7 @@ public class SignatureVerifier {
             bufin.close();
 
 
-            boolean verifies = sig.verify(sigToVerify);
+            boolean verifies = sig.verify(signedFile);
 
             System.out.println("signature verifies: " + verifies);
 

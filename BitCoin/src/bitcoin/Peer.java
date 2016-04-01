@@ -8,7 +8,7 @@ package bitcoin;
 import java.net.*;
 import java.io.*;
 import java.security.*;
-import java.util.ArrayList;
+
 import javax.crypto.*;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -20,10 +20,10 @@ public class Peer {
     public static final int PORT = 6789;
     public static final String GROUP_IP = "228.5.6.7";
     
-    private KeyHolder keyHolder;
-    private SignatureVerifier verifier;
-    private ArrayList wallets;
-    private Wallet myWallet;
+    private Wallet wallet;
+    private SignatureVerifier signatureVerifier;
+    private Database database;
+    private UserInformation myUserInformation;
     private MessageSender sender;
     private MessageReceiver receiver;
     private boolean exit;
@@ -32,17 +32,22 @@ public class Peer {
     
     public Peer(String username){
         System.out.println("Peer Constructor");
-        this.keyHolder = new KeyHolder();
-        this.verifier = new SignatureVerifier();
-        this.wallets = new ArrayList();
-        this.myWallet = new Wallet(username, 100, this.keyHolder.getNotEncodedPublicKey());
+//        this.keyHolder = new KeyHolder();
+//        this.verifier = new SignatureVerifier();
+//        this.wallets = new ArrayList();
+//        this.myWallet = new Wallet(username, 100, this.keyHolder.getNotEncodedPublicKey());
         this.scanner = new Scanner(System.in);
+        this.wallet = new Wallet();
+        this.signatureVerifier = new SignatureVerifier();
+        this.database = new Database();
+        this.myUserInformation = new UserInformation(username, 100, this.wallet.getPublicKey());
     }
     
     public void test_signature(){
-        keyHolder.signFile("test_file.txt");
-        verifier.verify("publicKey", "sig", "test_file.txt");
-        verifier.verify("publicKey", "sig", "test_file2.txt");
+        
+        byte [] signedFile = wallet.signFile("test_file.txt");
+        signatureVerifier.verify(myUserInformation.getPublicKey(), signedFile, "test_file.txt");
+        signatureVerifier.verify(myUserInformation.getPublicKey(), signedFile, "test_file2.txt");
     }
     
     public void start() {
@@ -53,13 +58,14 @@ public class Peer {
             InetAddress group = InetAddress.getByName(GROUP_IP);
             s = new MulticastSocket(PORT);
             s.joinGroup(group);
-            
+
             receiver = new MessageReceiver(s);
             receiver.start();
-            
+
             while (exit == false) {
                 System.out.println("Please enter you command:");
                 command = scanner.nextLine();
+                
                 switch (command) {
                     case "exit":
                         exit = true;
@@ -69,7 +75,7 @@ public class Peer {
                     case "hello":
                         // Sends hello message to group
                         //String helloMsg = "hello|" + myWallet.getPublicKey().toString() + "|" + myWallet.getCoins();
-                        String helloMsg = "hello|" + "public key" + "|" + myWallet.getCoins();
+                        String helloMsg = "hello|" + "public key" + "|" + "coins";
                         this.sender = new MessageSender(s, helloMsg);
                         sender.start();
                         break;

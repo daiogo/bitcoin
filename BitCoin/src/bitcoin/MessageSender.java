@@ -63,7 +63,7 @@ public class MessageSender extends Thread {
                     break;
             }
             socket.leaveGroup(group);
-            socket.close();
+            //socket.close();
         } catch (IOException ex) {
             Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
         }

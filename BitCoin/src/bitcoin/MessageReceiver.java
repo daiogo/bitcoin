@@ -44,7 +44,7 @@ public class MessageReceiver extends Thread {
             }
         }
         System.out.println("Receiver thread finished");
-        socket.close();
+        //socket.close();
     }
     
 }
