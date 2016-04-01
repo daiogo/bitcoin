@@ -21,11 +21,11 @@ public class KeyHolder {
         generateKeys();
     }
     
-    public byte[] getPublicKey(){
+    public byte[] getEncodedPublicKey(){
         return publicKey.getEncoded();
     }
     
-    public PublicKey getNotEncodedPublicKey(){
+    public PublicKey getPublicKey(){
         return publicKey;
     }
     
@@ -57,8 +57,9 @@ public class KeyHolder {
         }
     }
     
-    public void signFile(String nameOfFileToSign) {
+    public byte[] signFile(String nameOfFileToSign) {
 
+        byte[] realSig = null;
         try {
             /* Create a Signature object and initialize it with the private key */
 
@@ -82,18 +83,19 @@ public class KeyHolder {
             /* Now that all the data to be signed has been read in, 
                     generate a signature for it */
 
-            byte[] realSig = dsa.sign();
-
-        
+            realSig = dsa.sign();
+            
             /* Save the signature in a file */
+            /*
             FileOutputStream sigfos = new FileOutputStream("sig");
             sigfos.write(realSig);
 
             sigfos.close();
+            */
 
         } catch (Exception e) {
             System.err.println("Caught exception " + e.toString());
         }
-
+        return realSig;
     }
 }

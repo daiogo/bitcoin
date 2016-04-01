@@ -20,7 +20,7 @@ public class Peer {
     public static final String GROUP_IP = "228.5.6.7";
     
     private KeyHolder keyHolder;
-    private SignatureVerifier verifier;
+    private SignatureVerifier signatureVerifier;
     private ArrayList wallets;
     private Wallet myWallet;
     private MessageSender sender;
@@ -28,15 +28,16 @@ public class Peer {
     public Peer(String username){
         System.out.println("Peer Constructor");
         this.keyHolder = new KeyHolder();
-        this.verifier = new SignatureVerifier();
+        this.signatureVerifier = new SignatureVerifier();
         this.wallets = new ArrayList();
-        this.myWallet = new Wallet(username, 100, this.keyHolder.getNotEncodedPublicKey());
+        this.myWallet = new Wallet(username, 100, this.keyHolder.getPublicKey());
     }
     
     public void test_signature(){
-        keyHolder.signFile("test_file.txt");
-        verifier.verify(myWallet.getPublicKey(), "sig", "test_file.txt");
-        verifier.verify(myWallet.getPublicKey(), "sig", "test_file2.txt");
+        
+        byte [] signedFile = keyHolder.signFile("test_file.txt");
+        signatureVerifier.verify(myWallet.getPublicKey(), signedFile, "test_file.txt");
+        signatureVerifier.verify(myWallet.getPublicKey(), signedFile, "test_file2.txt");
     }
     
     public void start() {
