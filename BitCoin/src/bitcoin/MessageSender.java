@@ -6,7 +6,7 @@
 package bitcoin;
 
 import static bitcoin.Peer.GROUP_IP;
-import static bitcoin.Peer.PORT;
+import static bitcoin.Peer.MULTICAST_PORT;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -33,12 +33,12 @@ public class MessageSender extends Thread {
     }
     
     public void sendHello(byte[] helloMessage) throws IOException {
-        outPacket = new DatagramPacket(helloMessage, helloMessage.length, group, PORT);
+        outPacket = new DatagramPacket(helloMessage, helloMessage.length, group, MULTICAST_PORT);
         socket.send(outPacket);
     }
     
     public void sendTransaction(byte[] transactionMessage) throws IOException {
-        outPacket = new DatagramPacket(transactionMessage, transactionMessage.length, group, PORT);
+        outPacket = new DatagramPacket(transactionMessage, transactionMessage.length, group, MULTICAST_PORT);
         socket.send(outPacket);
     }
     
