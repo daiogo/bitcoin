@@ -5,7 +5,15 @@
  */
 package bitcoin;
 
+import static bitcoin.Peer.GROUP_IP;
+import static bitcoin.Peer.PORT;
+import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -13,23 +21,49 @@ import java.net.DatagramPacket;
  */
 public class MessageSender extends Thread {
     private DatagramPacket outPacket;
-    private byte[] helloMessage;
-    private byte[] transactionMessage;
+    private InetAddress group;
+    private MulticastSocket socket;
+    private String message;
+    private String messageType;
         
-    public MessageSender() {
-
+    public MessageSender(MulticastSocket socket, String message) throws UnknownHostException {
+        this.socket = socket;
+        this.group = InetAddress.getByName(GROUP_IP);
+        this.message = message;
     }
     
-    public void sendHello() {
-        
+    public void sendHello(byte[] helloMessage) throws IOException {
+        outPacket = new DatagramPacket(helloMessage, helloMessage.length, group, PORT);
+        socket.send(outPacket);
     }
     
-    public void sendTransaction() {
-        
+    public void sendTransaction(byte[] transactionMessage) throws IOException {
+        outPacket = new DatagramPacket(transactionMessage, transactionMessage.length, group, PORT);
+        socket.send(outPacket);
     }
     
     @Override
     public void run() {
+        // Parse message
+        // Define protocol like 
+        // Eg. hello|public key|coins|...
+        //messageType = message.matches("^[a-z]+|");
+        messageType = "hello";
         
+        try {
+            switch (messageType) {
+                case "hello":
+                    sendHello(message.getBytes());
+                    break;
+                case "trasaction":
+                    sendTransaction(message.getBytes());
+                    break;
+                default:
+                    System.out.println("ERROR | Message to be sent doesn't follow messaging protocol");
+                    break;
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

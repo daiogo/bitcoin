@@ -23,6 +23,7 @@ public class Peer {
     private SignatureVerifier verifier;
     private ArrayList wallets;
     private Wallet myWallet;
+    private MessageSender sender;
     
     public Peer(String username){
         System.out.println("Peer Constructor");
@@ -47,11 +48,11 @@ public class Peer {
             s = new MulticastSocket(PORT);
             s.joinGroup(group);
             
-            // Sends message to group
-            String string = "Hello";
-            byte[] helloMsg = string.getBytes();
-            DatagramPacket messageOut = new DatagramPacket(helloMsg, helloMsg.length, group, PORT);
-            s.send(messageOut);
+            // Sends hello message to group
+            //String helloMsg = "hello|" + myWallet.getPublicKey().toString() + "|" + myWallet.getCoins();
+            String helloMsg = "hello|" + "public key" + "|" + myWallet.getCoins();
+            this.sender = new MessageSender(s, helloMsg);
+            sender.start();
             
             // Sends your wallet to group to construct database
             
@@ -73,3 +74,4 @@ public class Peer {
         }
     }    
 }
+
