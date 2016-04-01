@@ -9,7 +9,7 @@ import java.security.spec.*;
  */
 public class SignatureVerifier {
     
-    public void verify(String publickeyfile, String signaturefile, String datafile ){
+    public void verify(PublicKey pubKey, String signaturefile, String datafile ){
         /* Verify a DSA signature */
 /*
         if (args.length != 3) {
@@ -17,19 +17,6 @@ public class SignatureVerifier {
         }
         */
         try{
-
-            /* import encoded public key */
-
-            FileInputStream keyfis = new FileInputStream(publickeyfile);
-            byte[] encKey = new byte[keyfis.available()];  
-            keyfis.read(encKey);
-
-            keyfis.close();
-
-            X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(encKey);
-
-            KeyFactory keyFactory = KeyFactory.getInstance("DSA", "SUN");
-            PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
 
             /* input the signature bytes */
             FileInputStream sigfis = new FileInputStream(signaturefile);

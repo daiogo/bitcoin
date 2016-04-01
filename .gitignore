@@ -4,3 +4,7 @@
 /BitCoin/nbproject/private/
 /BitCoin/build/
 /BitCoin/dist/
+
+#arquivos de chave
+BitCoin/publicKey 
+BitCoin/sig 

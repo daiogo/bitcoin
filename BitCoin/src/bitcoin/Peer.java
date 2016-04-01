@@ -35,8 +35,8 @@ public class Peer {
     
     public void test_signature(){
         keyHolder.signFile("test_file.txt");
-        verifier.verify("publicKey", "sig", "test_file.txt");
-        verifier.verify("publicKey", "sig", "test_file2.txt");
+        verifier.verify(myWallet.getPublicKey(), "sig", "test_file.txt");
+        verifier.verify(myWallet.getPublicKey(), "sig", "test_file2.txt");
     }
     
     public void start() {
@@ -50,7 +50,7 @@ public class Peer {
             
             // Sends hello message to group
             //String helloMsg = "hello|" + myWallet.getPublicKey().toString() + "|" + myWallet.getCoins();
-            String helloMsg = "hello|" + "public key" + "|" + myWallet.getCoins();
+            String helloMsg = "hello," + "public key" + "," + myWallet.getCoins();
             this.sender = new MessageSender(s, helloMsg);
             sender.start();
             
