@@ -5,44 +5,97 @@
  */
 package bitcoin;
 
-import java.security.PublicKey;
+import java.io.*;
+import java.security.*;
 
 /**
  *
- * @author Diogo
+ * @author diego
  */
 public class Wallet {
-    private String username;
-    private int coins;
+    
+    private PrivateKey privateKey; 
     private PublicKey publicKey;
     
-    public Wallet(String username, int coins, PublicKey publicKey) {
-        this.username = username;
-        this.coins = coins;
-        this.publicKey = publicKey;
+    public Wallet(){
+        generateKeys();
     }
-
-    public String getUsername() {
-        return username;
+    
+    public byte[] getEncodedPublicKey(){
+        return publicKey.getEncoded();
     }
-
-    public int getCoins() {
-        return coins;
-    }
-
-    public PublicKey getPublicKey() {
+    
+    public PublicKey getPublicKey(){
         return publicKey;
     }
+    
+    private void generateKeys(){
+        
+        /* Generate a DSA signature */
+        try{
+            /* Generate a key pair */
 
-    public void setUsername(String username) {
-        this.username = username;
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA", "SUN");
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+
+            keyGen.initialize(1024, random);
+
+            KeyPair pair = keyGen.generateKeyPair();
+            privateKey = pair.getPrivate();
+            publicKey = pair.getPublic();
+            
+            /* Save the public key in a file */
+            byte[] key = publicKey.getEncoded();
+            System.out.println("Key created!");
+            FileOutputStream keyfos = new FileOutputStream("publicKey");
+            keyfos.write(key);
+
+            keyfos.close();
+            
+        } catch (Exception e) {
+            System.err.println("Caught exception " + e.toString());
+        }
     }
+    
+    public byte[] signFile(String nameOfFileToSign) {
 
-    public void setCoins(int coins) {
-        this.coins = coins;
-    }
+        byte[] realSig = null;
+        try {
+            /* Create a Signature object and initialize it with the private key */
 
-    public void setPublicKey(PublicKey publicKey) {
-        this.publicKey = publicKey;
+            Signature dsa = Signature.getInstance("SHA1withDSA", "SUN"); 
+
+            dsa.initSign(privateKey);
+
+            /* Update and sign the data */
+
+            FileInputStream fis = new FileInputStream(nameOfFileToSign);
+            BufferedInputStream bufin = new BufferedInputStream(fis);
+            byte[] buffer = new byte[1024];
+            int len;
+            while (bufin.available() != 0) {
+                len = bufin.read(buffer);
+                dsa.update(buffer, 0, len);
+            };
+
+            bufin.close();
+
+            /* Now that all the data to be signed has been read in, 
+                    generate a signature for it */
+
+            realSig = dsa.sign();
+            
+            /* Save the signature in a file */
+            /*
+            FileOutputStream sigfos = new FileOutputStream("sig");
+            sigfos.write(realSig);
+
+            sigfos.close();
+            */
+
+        } catch (Exception e) {
+            System.err.println("Caught exception " + e.toString());
+        }
+        return realSig;
     }
 }

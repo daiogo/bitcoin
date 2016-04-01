@@ -8,9 +8,9 @@ package bitcoin;
 import java.net.*;
 import java.io.*;
 import java.security.*;
-import java.util.ArrayList;
+
 import javax.crypto.*;
-import java.util.Arrays;
+
 /**
  *
  * @author diego
@@ -19,25 +19,25 @@ public class Peer {
     public static final int PORT = 6789;
     public static final String GROUP_IP = "228.5.6.7";
     
-    private KeyHolder keyHolder;
+    private Wallet wallet;
     private SignatureVerifier signatureVerifier;
-    private ArrayList wallets;
-    private Wallet myWallet;
+    private Database database;
+    private UserInformation myUserInformation;
     private MessageSender sender;
     
     public Peer(String username){
         System.out.println("Peer Constructor");
-        this.keyHolder = new KeyHolder();
+        this.wallet = new Wallet();
         this.signatureVerifier = new SignatureVerifier();
-        this.wallets = new ArrayList();
-        this.myWallet = new Wallet(username, 100, this.keyHolder.getPublicKey());
+        this.database = new Database();
+        this.myUserInformation = new UserInformation(username, 100, this.wallet.getPublicKey());
     }
     
     public void test_signature(){
         
-        byte [] signedFile = keyHolder.signFile("test_file.txt");
-        signatureVerifier.verify(myWallet.getPublicKey(), signedFile, "test_file.txt");
-        signatureVerifier.verify(myWallet.getPublicKey(), signedFile, "test_file2.txt");
+        byte [] signedFile = wallet.signFile("test_file.txt");
+        signatureVerifier.verify(myUserInformation.getPublicKey(), signedFile, "test_file.txt");
+        signatureVerifier.verify(myUserInformation.getPublicKey(), signedFile, "test_file2.txt");
     }
     
     public void start() {
@@ -50,8 +50,8 @@ public class Peer {
             s.joinGroup(group);
             
             // Sends hello message to group
-            //String helloMsg = "hello|" + myWallet.getPublicKey().toString() + "|" + myWallet.getCoins();
-            String helloMsg = "hello," + "public key" + "," + myWallet.getCoins();
+            //String helloMsg = "hello|" + myUserInformation.getPublicKey().toString() + "|" + myUserInformation.getCoins();
+            String helloMsg = "hello," + "public key" + "," + myUserInformation.getCoins();
             this.sender = new MessageSender(s, helloMsg);
             sender.start();
             
