@@ -17,6 +17,7 @@ import java.util.logging.Logger;
  * @author Diogo
  */
 public class MessageReceiver extends Thread {
+    public static final int MAX_UDP_MESSAGE_SIZE = 65507;
     private DatagramPacket inPacket;
     private MulticastSocket socket;
     private boolean exit;
@@ -25,7 +26,7 @@ public class MessageReceiver extends Thread {
     public MessageReceiver(MulticastSocket socket) throws UnknownHostException {
         this.socket = socket;
         this.exit = false;
-        this.buffer = new byte[1000];
+        this.buffer = new byte[MAX_UDP_MESSAGE_SIZE];
     }
     
     public void setExit(boolean exit) {

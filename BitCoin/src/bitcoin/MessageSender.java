@@ -39,8 +39,10 @@ public class MessageSender extends Thread {
     
     public void sendHello(String username, String coinPrice, int unicast_port, byte[] encodedPublicKey) throws IOException {
         String message = "hello," + username + "," + coinPrice + ","
-                + Integer.toString(unicast_port) + "," + Arrays.toString(encodedPublicKey);
+                + Integer.toString(unicast_port) + "," + Arrays.toString(encodedPublicKey);      
+        //System.out.println("Hello message to send: "+message);
         byte[] messageBytes = message.getBytes();
+        
         outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
         socket.send(outPacket);
     }
