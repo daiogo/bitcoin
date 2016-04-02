@@ -30,8 +30,9 @@ public class Peer {
     private String command;
     private String username;
     private int unicast_port;
+    private String coinPrice;
     
-    public Peer(String username, String unicast_port){
+    public Peer(String username, String unicast_port, String coinPrice){
         System.out.println("Peer Constructor");
 //        this.keyHolder = new KeyHolder();
 //        this.verifier = new SignatureVerifier();
@@ -44,6 +45,7 @@ public class Peer {
         this.signatureVerifier = new SignatureVerifier();
         this.database = new Database();
         this.myUserInformation = new UserInformation(username, 100, this.wallet.getPublicKey());
+        this.coinPrice = coinPrice;
     }
     
     public void test_signature(){
@@ -53,7 +55,7 @@ public class Peer {
         signatureVerifier.verify(myUserInformation.getPublicKey(), signedFile, "test_file2.txt");
     }
     
-    public void start() {
+    public void init_peer() {
         MulticastSocket multicastSocket = null;
         
         try {
@@ -61,12 +63,15 @@ public class Peer {
             InetAddress group = InetAddress.getByName(GROUP_IP);
             multicastSocket = new MulticastSocket(MULTICAST_PORT);
             multicastSocket.joinGroup(group);
-
+            
+            sender = new MessageSender(multicastSocket);
+            System.out.println("I have just entered in this group! Sending Hello Message!");
+            sender.sendHello(username,coinPrice,unicast_port,wallet.getEncodedPublicKey());
             receiver = new MessageReceiver(multicastSocket);
             receiver.start();
 
             while (exit == false) {
-                System.out.println("Please enter you command:");
+                System.out.println("Please enter your command:");
                 command = scanner.nextLine();
                 
                 switch (command) {
@@ -75,12 +80,8 @@ public class Peer {
                         receiver.setExit(exit);
                         System.out.println("Exiting...");
                         break;
-                    case "hello":
-                        // Sends hello message to group
-                        //String helloMsg = "hello|" + myWallet.getPublicKey().toString() + "|" + myWallet.getCoins();
-                        String helloMsg = "hello|" + "public key" + "|" + "coins";
-                        this.sender = new MessageSender(multicastSocket, helloMsg);
-                        sender.start();
+                    case "help":
+                        System.out.println("Commands Help:");
                         break;
                     default:
                         System.out.println("ERROR | Command not found");

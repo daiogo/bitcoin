@@ -15,13 +15,13 @@ public class BitCoin {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        if(args.length < 2){
-            System.out.println("Please use two arguments: ID PORT");
+        if(args.length < 3){
+            System.out.println("Please use three arguments: ID PORT CoinPrice");
             System.exit(0);
         }
-	Peer peer = new Peer(args[0], args[1]);
-	peer.test_signature();
-        peer.start();
+	Peer peer = new Peer(args[0], args[1], args[2]);
+	//peer.test_signature();
+        peer.init_peer();
         //peer.start();
     }
     

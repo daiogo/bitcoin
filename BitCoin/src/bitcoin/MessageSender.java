@@ -12,28 +12,36 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author Diogo
- */
+/*
+Multicast Messages:
+hello = hello,username,coinPrice,port,publicKey
+mining = mining,username,transaction,valid(true/false)
+byebye = byebye,username
+
+Unicast Messages:
+buy = buy,username
+database = database
+*/
+
 public class MessageSender extends Thread {
     private DatagramPacket outPacket;
     private InetAddress group;
     private MulticastSocket socket;
-    private String message;
-    private String messageType;
         
-    public MessageSender(MulticastSocket socket, String message) throws UnknownHostException {
+    public MessageSender(MulticastSocket socket) throws UnknownHostException {
         this.socket = socket;
         this.group = InetAddress.getByName(GROUP_IP);
-        this.message = message;
     }
     
-    public void sendHello(byte[] helloMessage) throws IOException {
-        outPacket = new DatagramPacket(helloMessage, helloMessage.length, group, MULTICAST_PORT);
+    public void sendHello(String username, String coinPrice, int unicast_port, byte[] encodedPublicKey) throws IOException {
+        String message = "hello," + username + "," + coinPrice + ","
+                + Integer.toString(unicast_port) + "," + Arrays.toString(encodedPublicKey);
+        byte[] messageBytes = message.getBytes();
+        outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
         socket.send(outPacket);
     }
     
@@ -42,13 +50,14 @@ public class MessageSender extends Thread {
         socket.send(outPacket);
     }
     
+    /*
     @Override
     public void run() {
         // Parse message
         // Define protocol like 
         // Eg. hello|public key|coins|...
         //messageType = message.matches("^[a-z]+|");
-        messageType = "hello";
+        String messageType = "hello";
         
         try {
             switch (messageType) {
@@ -68,4 +77,5 @@ public class MessageSender extends Thread {
             Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    */
 }

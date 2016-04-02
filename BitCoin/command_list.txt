@@ -1,0 +1,8 @@
+Multicast Messages:
+hello = hello,coinPrice,username,port,publicKey
+mining = mining,username,transaction,valid(true/false)
+byebye = byebye,username
+
+Unicast Messages:
+buy = buy,username
+database = database
