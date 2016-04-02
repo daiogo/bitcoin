@@ -55,7 +55,7 @@ public class Wallet {
             keyfos.close();
             */
             System.out.println("Key created!");
-            System.out.println(Arrays.toString(publicKey.getEncoded()));
+            //System.out.println(Arrays.toString(publicKey.getEncoded()));
             
         } catch (Exception e) {
             System.err.println("Caught exception " + e.toString());

@@ -17,6 +17,7 @@ import java.util.logging.Logger;
  * @author Diogo
  */
 public class MessageListener extends Thread {
+    public static final int MAX_UDP_MESSAGE_SIZE = 65535;
     private MessageHandler handler;
     private DatagramPacket inPacket;
     private MulticastSocket socket;
@@ -35,7 +36,7 @@ public class MessageListener extends Thread {
     public void run() {
         while (exit == false) {
             try {
-                byte buffer[] = new byte[65535];
+                byte buffer[] = new byte[MAX_UDP_MESSAGE_SIZE];
                 inPacket = new DatagramPacket(buffer, buffer.length);
                 socket.receive(inPacket);
                 handler = new MessageHandler(inPacket.getData());
