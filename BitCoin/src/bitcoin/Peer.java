@@ -47,7 +47,8 @@ public class Peer {
         this.database = new Database();
         this.myUserInformation = new UserInformation(username, 100, this.wallet.getPublicKey());
         this.coinPrice = coinPrice;
-        peerWindow = new PeerWindow();
+        peerWindow = new PeerWindow(myUserInformation);
+        peerWindow.setVisible(true);
     }
     
     public void test_signature(){
@@ -59,7 +60,6 @@ public class Peer {
     
     public void init_peer() {
         MulticastSocket multicastSocket = null;
-        peerWindow.setVisible(true);
         
         try {
             // Sets group settings and join multicast group
