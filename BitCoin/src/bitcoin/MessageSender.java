@@ -7,7 +7,11 @@ package bitcoin;
 
 import static bitcoin.Peer.GROUP_IP;
 import static bitcoin.Peer.MULTICAST_PORT;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
@@ -31,7 +35,22 @@ public class MessageSender {
     private DatagramPacket outPacket;
     private InetAddress group;
     private MulticastSocket socket;
-        
+
+    public static byte[] serialize_object(Object object){
+        byte[] serialized_object = null;
+        try {
+            ObjectOutputStream objectOut = null;
+            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+            objectOut = new ObjectOutputStream(byteOut);
+            objectOut.writeObject(object);
+            serialized_object = byteOut.toByteArray();
+            return serialized_object;
+        } catch (IOException ex) {
+            Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return serialized_object;
+    }   
+    
     public MessageSender(MulticastSocket socket) throws UnknownHostException {
         this.socket = socket;
         this.group = InetAddress.getByName(GROUP_IP);
