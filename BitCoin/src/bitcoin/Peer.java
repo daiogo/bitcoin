@@ -54,15 +54,15 @@ public class Peer {
     }
     
     public void start() {
-        MulticastSocket s = null;
+        MulticastSocket multicastSocket = null;
         
         try {
             // Sets group settings and join multicast group
             InetAddress group = InetAddress.getByName(GROUP_IP);
-            s = new MulticastSocket(MULTICAST_PORT);
-            s.joinGroup(group);
+            multicastSocket = new MulticastSocket(MULTICAST_PORT);
+            multicastSocket.joinGroup(group);
 
-            receiver = new MessageReceiver(s);
+            receiver = new MessageReceiver(multicastSocket);
             receiver.start();
 
             while (exit == false) {
@@ -79,7 +79,7 @@ public class Peer {
                         // Sends hello message to group
                         //String helloMsg = "hello|" + myWallet.getPublicKey().toString() + "|" + myWallet.getCoins();
                         String helloMsg = "hello|" + "public key" + "|" + "coins";
-                        this.sender = new MessageSender(s, helloMsg);
+                        this.sender = new MessageSender(multicastSocket, helloMsg);
                         sender.start();
                         break;
                     default:
@@ -89,12 +89,12 @@ public class Peer {
             }
             
             // Exit program
-            s.leaveGroup(group);
+            multicastSocket.leaveGroup(group);
         } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+            System.out.println("Peer Start Exception: " + e.getMessage());
         } finally {
-            if (s != null)
-                s.close();
+            if (multicastSocket != null)
+                multicastSocket.close();
         }
     }    
 }
