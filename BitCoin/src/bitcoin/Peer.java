@@ -17,8 +17,9 @@ import java.util.Scanner;
  * @author diego
  */
 public class Peer {
+    public static final int MIN_USERS = 4;
     public static final int PORT = 6789;
-    public static final String GROUP_IP = "228.5.6.7";
+    public static final String GROUP_IP = "228.42.42.42";
     
     private Wallet wallet;
     private SignatureVerifier signatureVerifier;
@@ -41,6 +42,7 @@ public class Peer {
         this.signatureVerifier = new SignatureVerifier();
         this.database = new Database();
         this.myUserInformation = new UserInformation(username, 100, this.wallet.getPublicKey());
+        this.database.getArrayUserInformation().add(this.myUserInformation);
     }
     
     public void test_signature(){
@@ -78,6 +80,16 @@ public class Peer {
                         String helloMsg = "hello|" + "public key" + "|" + "coins";
                         this.sender = new MessageSender(s, helloMsg);
                         sender.start();
+                        break;
+                    case "transaction":
+                        //if (database.getNumberOfUsers() >= MIN_USERS) {
+                            String transactionMsg = "transaction," + "public key" + "," + "coins";
+                            this.sender = new MessageSender(s, transactionMsg);
+                            sender.start();
+                        //} else {
+                        //    System.out.println("ERROR | You may only perform a transaction when at least 4 users are in the network.");
+                        //    System.out.println("      | There are currently " + database.getNumberOfUsers() + " users.");
+                        //}
                         break;
                     default:
                         System.out.println("ERROR | Command not found");
