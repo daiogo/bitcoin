@@ -27,7 +27,7 @@ buy = buy,username
 database = database
 */
 
-public class MessageSender extends Thread {
+public class MessageSender {
     private DatagramPacket outPacket;
     private InetAddress group;
     private MulticastSocket socket;
@@ -47,8 +47,9 @@ public class MessageSender extends Thread {
         socket.send(outPacket);
     }
     
-    public void sendTransaction(byte[] transactionMessage) throws IOException {
-        outPacket = new DatagramPacket(transactionMessage, transactionMessage.length, group, MULTICAST_PORT);
+    public void sendTransaction() throws IOException {
+        byte[] m = "OLA BOCOS".getBytes();
+        outPacket = new DatagramPacket(m, m.length, group, MULTICAST_PORT);
         socket.send(outPacket);
     }
     
@@ -73,8 +74,12 @@ public class MessageSender extends Thread {
                     System.out.println("ERROR | Message to be sent doesn't follow messaging protocol");
                     break;
             }
+<<<<<<< HEAD
+            
+=======
 
             //socket.close();
+>>>>>>> a4fdb5b2b839ea6e85a88c92ad9607bf0968d255
         } catch (IOException ex) {
             Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
         }

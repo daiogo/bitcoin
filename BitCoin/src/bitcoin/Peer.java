@@ -17,6 +17,7 @@ import java.util.Scanner;
  * @author diego
  */
 public class Peer {
+    public static final int MIN_USERS = 4;
     public static final int MULTICAST_PORT = 6789;
     public static final String GROUP_IP = "228.5.6.7";
     private Wallet wallet;
@@ -24,7 +25,7 @@ public class Peer {
     private Database database;
     private UserInformation myUserInformation;
     private MessageSender sender;
-    private MessageReceiver receiver;
+    private MessageListener receiver;
     private boolean exit;
     private Scanner scanner;
     private String command;
@@ -46,6 +47,7 @@ public class Peer {
         this.signatureVerifier = new SignatureVerifier();
         this.database = new Database();
         this.myUserInformation = new UserInformation(username, 100, this.wallet.getPublicKey());
+        this.database.getArrayUserInformation().add(this.myUserInformation);
         this.coinPrice = coinPrice;
         peerWindow = new PeerWindow(myUserInformation);
         peerWindow.setVisible(true);
@@ -67,11 +69,14 @@ public class Peer {
             multicastSocket = new MulticastSocket(MULTICAST_PORT);
             multicastSocket.joinGroup(group);
             
+            // Starts MessageListener thread
+            receiver = new MessageListener(multicastSocket);
+            receiver.start();
+            
+            // Sends Hello Message at the start to the multicast group
             sender = new MessageSender(multicastSocket);
             System.out.println("I have just entered in this group! Sending Hello Message!");
             sender.sendHello(username,coinPrice,unicast_port,wallet.getEncodedPublicKey());
-            receiver = new MessageReceiver(multicastSocket);
-            receiver.start();
 
             while (exit == false) {
                 System.out.println("Please enter your command:");
@@ -85,6 +90,15 @@ public class Peer {
                         break;
                     case "help":
                         System.out.println("Commands Help:");
+                        break;
+                    case "transaction":
+                        //if (database.getNumberOfUsers() >= MIN_USERS) {
+                            this.sender = new MessageSender(multicastSocket);
+                            sender.sendTransaction();
+                        //} else {
+                        //    System.out.println("ERROR | You may only perform a transaction when at least 4 users are in the network.");
+                        //    System.out.println("      | There are currently " + database.getNumberOfUsers() + " users.");
+                        //}
                         break;
                     default:
                         System.out.println("ERROR | Command not found");
