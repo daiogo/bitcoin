@@ -16,16 +16,15 @@ import java.util.logging.Logger;
  *
  * @author Diogo
  */
-public class MessageReceiver extends Thread {
+public class MessageListener extends Thread {
+    private MessageHandler handler;
     private DatagramPacket inPacket;
     private MulticastSocket socket;
     private boolean exit;
-    private byte[] buffer;
         
-    public MessageReceiver(MulticastSocket socket) throws UnknownHostException {
+    public MessageListener(MulticastSocket socket) throws UnknownHostException {
         this.socket = socket;
         this.exit = false;
-        this.buffer = new byte[1000];
     }
     
     public void setExit(boolean exit) {
@@ -36,15 +35,16 @@ public class MessageReceiver extends Thread {
     public void run() {
         while (exit == false) {
             try {
+                byte buffer[] = new byte[65535];
                 inPacket = new DatagramPacket(buffer, buffer.length);
                 socket.receive(inPacket);
-                System.out.println("Received:" + new String(inPacket.getData()));
+                handler = new MessageHandler(inPacket.getData());
+                handler.start();
             } catch (IOException ex) {
-                Logger.getLogger(MessageReceiver.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(MessageListener.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         System.out.println("Receiver thread finished");
-        //socket.close();
     }
     
 }

@@ -7,6 +7,7 @@ package bitcoin;
 
 import java.io.*;
 import java.security.*;
+import java.util.Arrays;
 
 /**
  *
@@ -45,12 +46,16 @@ public class Wallet {
             publicKey = pair.getPublic();
             
             /* Save the public key in a file */
+            /*
             byte[] key = publicKey.getEncoded();
-            System.out.println("Key created!");
+
             FileOutputStream keyfos = new FileOutputStream("publicKey");
             keyfos.write(key);
 
             keyfos.close();
+            */
+            System.out.println("Key created!");
+            System.out.println(Arrays.toString(publicKey.getEncoded()));
             
         } catch (Exception e) {
             System.err.println("Caught exception " + e.toString());

@@ -18,31 +18,36 @@ import java.util.Scanner;
  */
 public class Peer {
     public static final int MIN_USERS = 4;
-    public static final int PORT = 6789;
-    public static final String GROUP_IP = "228.42.42.42";
-    
+    public static final int MULTICAST_PORT = 6789;
+    public static final String GROUP_IP = "228.5.6.7";
     private Wallet wallet;
     private SignatureVerifier signatureVerifier;
     private Database database;
     private UserInformation myUserInformation;
     private MessageSender sender;
-    private MessageReceiver receiver;
+    private MessageListener receiver;
     private boolean exit;
     private Scanner scanner;
     private String command;
+    private String username;
+    private int unicast_port;
+    private String coinPrice;
     
-    public Peer(String username){
+    public Peer(String username, String unicast_port, String coinPrice){
         System.out.println("Peer Constructor");
 //        this.keyHolder = new KeyHolder();
 //        this.verifier = new SignatureVerifier();
 //        this.wallets = new ArrayList();
 //        this.myWallet = new Wallet(username, 100, this.keyHolder.getNotEncodedPublicKey());
+        this.username = username;
+        this.unicast_port = Integer.parseInt(unicast_port);
         this.scanner = new Scanner(System.in);
         this.wallet = new Wallet();
         this.signatureVerifier = new SignatureVerifier();
         this.database = new Database();
         this.myUserInformation = new UserInformation(username, 100, this.wallet.getPublicKey());
         this.database.getArrayUserInformation().add(this.myUserInformation);
+        this.coinPrice = coinPrice;
     }
     
     public void test_signature(){
@@ -52,20 +57,26 @@ public class Peer {
         signatureVerifier.verify(myUserInformation.getPublicKey(), signedFile, "test_file2.txt");
     }
     
-    public void start() {
-        MulticastSocket s = null;
+    public void init_peer() {
+        MulticastSocket multicastSocket = null;
         
         try {
             // Sets group settings and join multicast group
             InetAddress group = InetAddress.getByName(GROUP_IP);
-            s = new MulticastSocket(PORT);
-            s.joinGroup(group);
-
-            receiver = new MessageReceiver(s);
+            multicastSocket = new MulticastSocket(MULTICAST_PORT);
+            multicastSocket.joinGroup(group);
+            
+            // Starts MessageListener thread
+            receiver = new MessageListener(multicastSocket);
             receiver.start();
+            
+            // Sends Hello Message at the start to the multicast group
+            sender = new MessageSender(multicastSocket);
+            System.out.println("I have just entered in this group! Sending Hello Message!");
+            sender.sendHello(username,coinPrice,unicast_port,wallet.getEncodedPublicKey());
 
             while (exit == false) {
-                System.out.println("Please enter you command:");
+                System.out.println("Please enter your command:");
                 command = scanner.nextLine();
                 
                 switch (command) {
@@ -74,18 +85,13 @@ public class Peer {
                         receiver.setExit(exit);
                         System.out.println("Exiting...");
                         break;
-                    case "hello":
-                        // Sends hello message to group
-                        //String helloMsg = "hello|" + myWallet.getPublicKey().toString() + "|" + myWallet.getCoins();
-                        String helloMsg = "hello|" + "public key" + "|" + "coins";
-                        this.sender = new MessageSender(s, helloMsg);
-                        sender.start();
+                    case "help":
+                        System.out.println("Commands Help:");
                         break;
                     case "transaction":
                         //if (database.getNumberOfUsers() >= MIN_USERS) {
-                            String transactionMsg = "transaction," + "public key" + "," + "coins";
-                            this.sender = new MessageSender(s, transactionMsg);
-                            sender.start();
+                            this.sender = new MessageSender(multicastSocket);
+                            sender.sendTransaction();
                         //} else {
                         //    System.out.println("ERROR | You may only perform a transaction when at least 4 users are in the network.");
                         //    System.out.println("      | There are currently " + database.getNumberOfUsers() + " users.");
@@ -98,12 +104,12 @@ public class Peer {
             }
             
             // Exit program
-            s.leaveGroup(group);
+            multicastSocket.leaveGroup(group);
         } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+            System.out.println("Peer Start Exception: " + e.getMessage());
         } finally {
-            if (s != null)
-                s.close();
+            if (multicastSocket != null)
+                multicastSocket.close();
         }
     }    
 }
