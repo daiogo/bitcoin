@@ -5,6 +5,7 @@
  */
 package bitcoin;
 
+import bitcoin.messages.HelloMessage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -18,7 +19,11 @@ import java.util.logging.Logger;
  */
 public class MessageHandler extends Thread {
     private byte[] message;
-       
+    
+    public MessageHandler(byte[] message) {
+        this.message = message;
+    }
+    
     public static Object deserialize_object(byte[] message) {
         ObjectInputStream objIn = null;
         Object object = null;
@@ -41,11 +46,23 @@ public class MessageHandler extends Thread {
         return object;
     }
     
-    public MessageHandler(byte[] message) {
-        this.message = message;
+    public void run() {
+        Object object = deserialize_object(message);
+        String objectName = object.getClass().getName();
+        System.out.println("Class name: " + objectName);
+        
+        switch(objectName){
+            case "bitcoin.messages.HelloMessage":
+                handle_hello_message(HelloMessage.class.cast(object));
+                break;
+            default:
+                System.out.println("Message received class not found: " + objectName);
+                break;
+        }
     }
     
-    public void run() {
-        System.out.println("Received: " + new String(message));
+    public void handle_hello_message(HelloMessage helloMessage){
+        System.out.println("Received Hello Message");
+
     }
 }

@@ -76,8 +76,9 @@ public class Peer {
             // Sends Hello Message at the start to the multicast group
             sender = new MessageSender(multicastSocket);
             System.out.println("I have just entered in this group! Sending Hello Message!");
-            sender.sendHello(username,coinPrice,unicast_port,wallet.getEncodedPublicKey());
+            sender.sendHello(username,coinPrice,unicast_port,wallet.getPublicKey());
 
+            exit = false;
             while (exit == false) {
                 System.out.println("Please enter your command:");
                 command = scanner.nextLine();
@@ -93,7 +94,7 @@ public class Peer {
                         break;
                     case "transaction":
                         //if (database.getNumberOfUsers() >= MIN_USERS) {
-                            this.sender = new MessageSender(multicastSocket);
+                            //sender = new MessageSender(multicastSocket);
                             sender.sendTransaction();
                         //} else {
                         //    System.out.println("ERROR | You may only perform a transaction when at least 4 users are in the network.");

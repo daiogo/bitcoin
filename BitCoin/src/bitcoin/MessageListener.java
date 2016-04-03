@@ -35,6 +35,7 @@ public class MessageListener extends Thread {
     @Override
     public void run() {
         while (exit == false) {
+            
             try {
                 byte buffer[] = new byte[MAX_UDP_MESSAGE_SIZE];
                 inPacket = new DatagramPacket(buffer, buffer.length);
@@ -44,6 +45,7 @@ public class MessageListener extends Thread {
             } catch (IOException ex) {
                 Logger.getLogger(MessageListener.class.getName()).log(Level.SEVERE, null, ex);
             }
+
         }
         System.out.println("Receiver thread finished");
     }
