@@ -5,13 +5,14 @@
  */
 package bitcoin;
 
+import java.io.Serializable;
 import java.security.PublicKey;
 
 /**
  *
  * @author Diogo
  */
-public class UserInformation {
+public class UserInformation implements Serializable{
     private String username;
     private int coins;
     private PublicKey publicKey;

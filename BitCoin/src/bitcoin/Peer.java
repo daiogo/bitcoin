@@ -47,10 +47,15 @@ public class Peer {
         this.signatureVerifier = new SignatureVerifier();
         this.database = new Database();
         this.myUserInformation = new UserInformation(username, 100,coinPrice, unicastPort ,this.wallet.getPublicKey());
-        this.database.addUserInformation(this.myUserInformation);
+        this.database.addUserInformation(myUserInformation);
         this.coinPrice = coinPrice;
         peerWindow = new PeerWindow(myUserInformation);
         peerWindow.setVisible(true);
+        peerWindow.updateDatabase(database);
+    }
+    
+    public void databaseAddUserInformation(UserInformation userInformation){
+        database.addUserInformation(userInformation);
         peerWindow.updateDatabase(database);
     }
     
@@ -71,13 +76,13 @@ public class Peer {
             multicastSocket.joinGroup(group);
             
             // Starts MessageListener thread
-            receiver = new MessageListener(multicastSocket);
+            receiver = new MessageListener(multicastSocket, this);
             receiver.start();
             
             // Sends Hello Message at the start to the multicast group
             sender = new MessageSender(multicastSocket);
             System.out.println("I have just entered in this group! Sending Hello Message!");
-            sender.sendHello(username,coinPrice,unicastPort,wallet.getPublicKey());
+            sender.sendHello(myUserInformation);
 
             exit = false;
             while (exit == false) {
@@ -117,4 +122,9 @@ public class Peer {
                 multicastSocket.close();
         }
     }    
+    
+    public String getUsername(){
+        return username;
+    }
+    
 }

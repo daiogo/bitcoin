@@ -29,6 +29,9 @@ public class PeerWindow extends javax.swing.JFrame {
     public void updateDatabase(Database database){
         ArrayList arrayUserInformation = database.getArrayUserInformation();
         UserInformation userInformation;
+        while(tableModel.getRowCount() > 0){
+            tableModel.removeRow(0);
+        }
         for(int i = 0; i<arrayUserInformation.size(); i++){
             userInformation = UserInformation.class.cast(arrayUserInformation.get(i));
             tableModel.addRow(new Object[] {

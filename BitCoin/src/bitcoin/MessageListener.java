@@ -22,10 +22,12 @@ public class MessageListener extends Thread {
     private DatagramPacket inPacket;
     private MulticastSocket socket;
     private boolean exit;
+    private Peer myPeer;
         
-    public MessageListener(MulticastSocket socket) throws UnknownHostException {
+    public MessageListener(MulticastSocket socket, Peer peer) throws UnknownHostException {
         this.socket = socket;
         this.exit = false;
+        myPeer = peer;
     }
     
     public void setExit(boolean exit) {
@@ -40,7 +42,7 @@ public class MessageListener extends Thread {
                 byte buffer[] = new byte[MAX_UDP_MESSAGE_SIZE];
                 inPacket = new DatagramPacket(buffer, buffer.length);
                 socket.receive(inPacket);
-                handler = new MessageHandler(inPacket.getData());
+                handler = new MessageHandler(inPacket.getData(), myPeer);
                 handler.start();
             } catch (IOException ex) {
                 Logger.getLogger(MessageListener.class.getName()).log(Level.SEVERE, null, ex);

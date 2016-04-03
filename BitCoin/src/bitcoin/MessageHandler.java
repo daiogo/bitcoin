@@ -19,9 +19,11 @@ import java.util.logging.Logger;
  */
 public class MessageHandler extends Thread {
     private byte[] message;
+    private Peer myPeer;
     
-    public MessageHandler(byte[] message) {
+    public MessageHandler(byte[] message, Peer peer) {
         this.message = message;
+        myPeer = peer;
     }
     
     public static Object deserialize_object(byte[] message) {
@@ -63,5 +65,10 @@ public class MessageHandler extends Thread {
     
     public void handle_hello_message(HelloMessage helloMessage){
         System.out.println("Received Hello Message");
+        UserInformation userInformation = helloMessage.getUserInformation();
+        //ignore my own message
+        if(!userInformation.getUsername().equals(myPeer.getUsername())){
+            myPeer.databaseAddUserInformation(helloMessage.getUserInformation());
+        }
     }
 }

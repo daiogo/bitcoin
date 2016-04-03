@@ -5,8 +5,8 @@
  */
 package bitcoin.messages;
 
+import bitcoin.UserInformation;
 import java.io.Serializable;
-import java.security.PublicKey;
 
 /**
  *
@@ -15,15 +15,13 @@ import java.security.PublicKey;
 
 public class HelloMessage implements Serializable{
 
-    public String username;
-    public int coinPrice;
-    public int unicast_port;
-    public PublicKey publicKey;
+    private UserInformation userInformation; 
 
-    public HelloMessage(String username, int coinPrice, int unicast_port, PublicKey publicKey){
-        this.username = username;
-        this.coinPrice = coinPrice;
-        this.unicast_port = unicast_port;
-        this.publicKey = publicKey;
+    public HelloMessage(UserInformation userInformation){
+        this.userInformation = userInformation;
     }  
+    
+    public UserInformation getUserInformation(){
+        return userInformation;
+    }
 }

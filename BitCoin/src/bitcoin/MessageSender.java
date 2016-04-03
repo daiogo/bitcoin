@@ -55,8 +55,8 @@ public class MessageSender {
         return serialized_object;
     }   
     
-    public void sendHello(String username, String coinPrice, int unicast_port, PublicKey publicKey) throws IOException {        
-        HelloMessage hello = new HelloMessage(username, unicast_port, unicast_port, publicKey);
+    public void sendHello(UserInformation userInformation)throws IOException {        
+        HelloMessage hello = new HelloMessage(userInformation);
         byte[] messageBytes = serialize_object(hello);
         
         outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
