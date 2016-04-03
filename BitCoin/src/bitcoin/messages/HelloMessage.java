@@ -21,9 +21,9 @@ public class HelloMessage implements Serializable{
     public PublicKey publicKey;
 
     public HelloMessage(String username, int coinPrice, int unicast_port, PublicKey publicKey){
-         this.username = username;
-         this.coinPrice = coinPrice;
-         this.unicast_port = unicast_port;
-         this.publicKey = publicKey;
+        this.username = username;
+        this.coinPrice = coinPrice;
+        this.unicast_port = unicast_port;
+        this.publicKey = publicKey;
     }  
 }

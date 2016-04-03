@@ -19,7 +19,7 @@ public class BitCoin {
             System.out.println("Please use three arguments: ID PORT CoinPrice");
             System.exit(0);
         }
-	Peer peer = new Peer(args[0], args[1], args[2]);
+	Peer peer = new Peer(args[0], Integer.parseInt(args[1]), args[2]);
 	//peer.test_signature();
         peer.init_peer();
         //peer.start();

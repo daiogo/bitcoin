@@ -20,6 +20,12 @@ public class Database {
     public Database() {
         this.arrayUserInformation = new ArrayList();
         this.arrayTransactions = new ArrayList();
+        numberOfUsers = 0;
+        numberOfTransactions = 0;
+    }
+    
+    public void addUserInformation(UserInformation userInformation){
+        arrayUserInformation.add(userInformation);
     }
 
     public ArrayList getArrayUserInformation() {

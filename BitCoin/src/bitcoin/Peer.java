@@ -30,27 +30,28 @@ public class Peer {
     private Scanner scanner;
     private String command;
     private String username;
-    private int unicast_port;
+    private int unicastPort;
     private String coinPrice;
     private PeerWindow peerWindow;
     
-    public Peer(String username, String unicast_port, String coinPrice){
+    public Peer(String username, int unicastPort, String coinPrice){
         System.out.println("Peer Constructor");
 //        this.keyHolder = new KeyHolder();
 //        this.verifier = new SignatureVerifier();
 //        this.wallets = new ArrayList();
 //        this.myWallet = new Wallet(username, 100, this.keyHolder.getNotEncodedPublicKey());
         this.username = username;
-        this.unicast_port = Integer.parseInt(unicast_port);
+        this.unicastPort = unicastPort;
         this.scanner = new Scanner(System.in);
         this.wallet = new Wallet();
         this.signatureVerifier = new SignatureVerifier();
         this.database = new Database();
-        this.myUserInformation = new UserInformation(username, 100, this.wallet.getPublicKey());
-        this.database.getArrayUserInformation().add(this.myUserInformation);
+        this.myUserInformation = new UserInformation(username, 100,coinPrice, unicastPort ,this.wallet.getPublicKey());
+        this.database.addUserInformation(this.myUserInformation);
         this.coinPrice = coinPrice;
         peerWindow = new PeerWindow(myUserInformation);
         peerWindow.setVisible(true);
+        peerWindow.updateDatabase(database);
     }
     
     public void test_signature(){
@@ -76,7 +77,7 @@ public class Peer {
             // Sends Hello Message at the start to the multicast group
             sender = new MessageSender(multicastSocket);
             System.out.println("I have just entered in this group! Sending Hello Message!");
-            sender.sendHello(username,coinPrice,unicast_port,wallet.getPublicKey());
+            sender.sendHello(username,coinPrice,unicastPort,wallet.getPublicKey());
 
             exit = false;
             while (exit == false) {

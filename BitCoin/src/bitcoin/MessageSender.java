@@ -55,20 +55,12 @@ public class MessageSender {
         return serialized_object;
     }   
     
-    public void sendHello(String username, String coinPrice, int unicast_port, PublicKey publicKey) throws IOException {
-        /*
-        String message = "hello," + username + "," + coinPrice + ","
-                + Integer.toString(unicast_port) + "," + Arrays.toString(encodedPublicKey);      
-        byte[] messageBytes = message.getBytes();
-        */
-        //System.out.println("Hello message to send: "+message);
-        
+    public void sendHello(String username, String coinPrice, int unicast_port, PublicKey publicKey) throws IOException {        
         HelloMessage hello = new HelloMessage(username, unicast_port, unicast_port, publicKey);
         byte[] messageBytes = serialize_object(hello);
         
         outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
         socket.send(outPacket);
-
     }
     
     public void sendTransaction() throws IOException {
@@ -76,6 +68,5 @@ public class MessageSender {
         outPacket = new DatagramPacket(m, m.length, group, MULTICAST_PORT);
         socket.send(outPacket);
     }
-
 
 }

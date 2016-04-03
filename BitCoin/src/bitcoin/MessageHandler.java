@@ -63,6 +63,5 @@ public class MessageHandler extends Thread {
     
     public void handle_hello_message(HelloMessage helloMessage){
         System.out.println("Received Hello Message");
-
     }
 }

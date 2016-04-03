@@ -5,6 +5,9 @@
  */
 package bitcoin;
 
+import java.util.ArrayList;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author diego
@@ -14,10 +17,54 @@ public class PeerWindow extends javax.swing.JFrame {
     /**
      * Creates new form PeerWindow
      */
+    private DefaultTableModel tableModel;
+    
     public PeerWindow(UserInformation myUserInformation) {
         initComponents();
         label_welcome.setText("Welcome "+myUserInformation.getUsername());
+        this.setTitle("BitCoin Peer");
+        createTable();
+    }
+    
+    public void updateDatabase(Database database){
+        ArrayList arrayUserInformation = database.getArrayUserInformation();
+        UserInformation userInformation;
+        for(int i = 0; i<arrayUserInformation.size(); i++){
+            userInformation = UserInformation.class.cast(arrayUserInformation.get(i));
+            tableModel.addRow(new Object[] {
+                userInformation.getUsername(),
+                userInformation.getCoins(),
+                userInformation.getCoinPrice(),
+                true});
+        }
+    }
+    
+    private void createTable(){
+        tableModel = (new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "User", "Coins", "Price", "PublicKey"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         
+        table_database.setModel(tableModel);
     }
 
     /**
@@ -78,7 +125,7 @@ public class PeerWindow extends javax.swing.JFrame {
 
         table_database.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null}
+
             },
             new String [] {
                 "User", "Coins", "Price", "PublicKey"
@@ -99,8 +146,12 @@ public class PeerWindow extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        table_database.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(table_database);
         if (table_database.getColumnModel().getColumnCount() > 0) {
+            table_database.getColumnModel().getColumn(0).setResizable(false);
+            table_database.getColumnModel().getColumn(1).setResizable(false);
+            table_database.getColumnModel().getColumn(2).setResizable(false);
             table_database.getColumnModel().getColumn(3).setResizable(false);
         }
 
