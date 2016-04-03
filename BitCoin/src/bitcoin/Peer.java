@@ -53,13 +53,18 @@ public class Peer {
         this.myUserInformation = new UserInformation(username, 100,coinPrice, unicastPort ,this.wallet.getPublicKey());
         this.database.addUserInformation(myUserInformation);
         this.coinPrice = coinPrice;
-        peerWindow = new PeerWindow(myUserInformation);
+        peerWindow = new PeerWindow(myUserInformation, this);
         peerWindow.setVisible(true);
         updateDatabaseTable();
     }
     
-    public void databaseAddUserInformation(UserInformation userInformation){
+    public synchronized void databaseAddUserInformation(UserInformation userInformation){
         database.addUserInformation(userInformation);
+        peerWindow.updateDatabase(database);
+    }
+    
+    public synchronized void databaseRemoveUserInformation(UserInformation userInformation){
+        database.removeUserInformation(userInformation);
         peerWindow.updateDatabase(database);
     }
     
@@ -93,34 +98,39 @@ public class Peer {
         }
     }
 
-    public void sendMessage(String command) throws IOException{
-        switch (command) {
-            case "hello":
-                messageSender.sendHello(myUserInformation);
-                break;
-            case "database":
-                messageSender.sendDatabase(database);
-                break;
-            case "exit":
-                exit = true;
-                receiver.setExit(exit);
-                System.out.println("Exiting...");
-                break;
-            case "help":
-                System.out.println("Commands Help:");
-                break;
-            case "transaction":
-                //if (database.getNumberOfUsers() >= MIN_USERS) {
-                    //sender = new MessageSender(multicastSocket);
-                    messageSender.sendTransaction();
-                //} else {
-                //    System.out.println("ERROR | You may only perform a transaction when at least 4 users are in the network.");
-                //    System.out.println("      | There are currently " + database.getNumberOfUsers() + " users.");
-                //}
-                break;
-            default:
-                System.out.println("ERROR | Command not found");
-                break;
+    public void sendMessage(String command) {
+        try{
+            switch (command) {
+                case "hello":
+                    messageSender.sendHello(myUserInformation);
+                    break;
+                case "database":
+                    messageSender.sendDatabase(database);
+                    break;
+                case "exit":
+                    messageSender.sendExit(myUserInformation);
+                    exit = true;
+                    receiver.setExit(exit);
+                    System.out.println("Exiting...");
+                    break;
+                case "help":
+                    System.out.println("Commands Help:");
+                    break;
+                case "transaction":
+                    //if (database.getNumberOfUsers() >= MIN_USERS) {
+                        //sender = new MessageSender(multicastSocket);
+                        messageSender.sendTransaction();
+                    //} else {
+                    //    System.out.println("ERROR | You may only perform a transaction when at least 4 users are in the network.");
+                    //    System.out.println("      | There are currently " + database.getNumberOfUsers() + " users.");
+                    //}
+                    break;
+                default:
+                    System.out.println("ERROR | Command not found");
+                    break;
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(PeerWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -135,12 +145,12 @@ public class Peer {
             multicastSocket.close();
     }
     
-    public void setDatabase(Database database){
+    public synchronized void setDatabase(Database database){
         this.database = database;
         updateDatabaseTable();
     }
     
-    public void updateDatabaseTable(){
+    public synchronized void updateDatabaseTable(){
         peerWindow.updateDatabase(database);
     }
 }

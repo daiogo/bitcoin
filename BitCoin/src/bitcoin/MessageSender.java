@@ -7,6 +7,7 @@ package bitcoin;
 
 import static bitcoin.Peer.GROUP_IP;
 import static bitcoin.Peer.MULTICAST_PORT;
+import bitcoin.messages.ExitMessage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -67,6 +68,15 @@ public class MessageSender {
         outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
         socket.send(outPacket);
     }
+    
+    public void sendExit(UserInformation userInformation)throws IOException {   
+        ExitMessage exitMessage = new ExitMessage(userInformation);
+        byte[] messageBytes = serialize_object(exitMessage);
+        
+        outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
+        socket.send(outPacket);
+    }
+    
     
     public void sendTransaction() throws IOException {
         byte[] m = "OLA BOCOS".getBytes();

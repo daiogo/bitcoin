@@ -18,12 +18,15 @@ public class PeerWindow extends javax.swing.JFrame {
      * Creates new form PeerWindow
      */
     private DefaultTableModel tableModel;
+    private Peer myPeer;
     
-    public PeerWindow(UserInformation myUserInformation) {
+    public PeerWindow(UserInformation myUserInformation, Peer peer) {
+        myPeer = peer;
         initComponents();
         label_welcome.setText("Welcome "+myUserInformation.getUsername());
         this.setTitle("BitCoin Peer");
         createTable();
+        
     }
     
     public void updateDatabase(Database database){
@@ -298,6 +301,8 @@ public class PeerWindow extends javax.swing.JFrame {
 
     private void button_exitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_exitActionPerformed
         // TODO add your handling code here:
+        myPeer.sendMessage("exit");
+        System.exit(0);
     }//GEN-LAST:event_button_exitActionPerformed
 
     /**

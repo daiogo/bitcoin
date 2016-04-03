@@ -5,6 +5,7 @@
  */
 package bitcoin;
 
+import bitcoin.messages.ExitMessage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -60,6 +61,9 @@ public class MessageHandler extends Thread {
             case "bitcoin.Database":
                 handle_database_message(Database.class.cast(object));
                 break;
+            case "bitcoin.messages.ExitMessage":
+                handle_exit_message(ExitMessage.class.cast(object));
+                break;
             default:
                 System.out.println("Message received class not found: " + objectName);
                 break;
@@ -72,17 +76,17 @@ public class MessageHandler extends Thread {
         if(!userInformation.getUsername().equals(myPeer.getUsername())){
             //add new user to database
             myPeer.databaseAddUserInformation(userInformation);
-            try {
-                //send database to user
-                myPeer.sendMessage("database");
-            } catch (IOException ex) {
-                Logger.getLogger(MessageHandler.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            myPeer.sendMessage("database");
         }
     }
     
     public void handle_database_message(Database database){
         System.out.println("Received Database message");
         myPeer.setDatabase(database);
+    }
+    
+    public void handle_exit_message(ExitMessage exitMessage){
+        System.out.println("Received Exit Message");
+        myPeer.databaseRemoveUserInformation(exitMessage.getUserInformation());
     }
 }
