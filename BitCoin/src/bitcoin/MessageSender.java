@@ -7,7 +7,6 @@ package bitcoin;
 
 import static bitcoin.Peer.GROUP_IP;
 import static bitcoin.Peer.MULTICAST_PORT;
-import bitcoin.messages.HelloMessage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -56,8 +55,14 @@ public class MessageSender {
     }   
     
     public void sendHello(UserInformation userInformation)throws IOException {        
-        HelloMessage hello = new HelloMessage(userInformation);
-        byte[] messageBytes = serialize_object(hello);
+        byte[] messageBytes = serialize_object(userInformation);
+        
+        outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
+        socket.send(outPacket);
+    }
+    
+    public void sendDatabase(Database database)throws IOException {        
+        byte[] messageBytes = serialize_object(database);
         
         outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
         socket.send(outPacket);

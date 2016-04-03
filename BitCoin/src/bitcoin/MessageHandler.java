@@ -5,7 +5,6 @@
  */
 package bitcoin;
 
-import bitcoin.messages.HelloMessage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -51,11 +50,15 @@ public class MessageHandler extends Thread {
     public void run() {
         Object object = deserialize_object(message);
         String objectName = object.getClass().getName();
-        System.out.println("Class name: " + objectName);
+        //System.out.println("Class name: " + objectName);
         
         switch(objectName){
-            case "bitcoin.messages.HelloMessage":
-                handle_hello_message(HelloMessage.class.cast(object));
+            case "bitcoin.UserInformation":
+                //Hello message
+                handle_hello_message(UserInformation.class.cast(object));
+                break;
+            case "bitcoin.Database":
+                handle_database_message(Database.class.cast(object));
                 break;
             default:
                 System.out.println("Message received class not found: " + objectName);
@@ -63,12 +66,23 @@ public class MessageHandler extends Thread {
         }
     }
     
-    public void handle_hello_message(HelloMessage helloMessage){
+    public void handle_hello_message(UserInformation userInformation){
         System.out.println("Received Hello Message");
-        UserInformation userInformation = helloMessage.getUserInformation();
         //ignore my own message
         if(!userInformation.getUsername().equals(myPeer.getUsername())){
-            myPeer.databaseAddUserInformation(helloMessage.getUserInformation());
+            //add new user to database
+            myPeer.databaseAddUserInformation(userInformation);
+            try {
+                //send database to user
+                myPeer.sendMessage("database");
+            } catch (IOException ex) {
+                Logger.getLogger(MessageHandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+    }
+    
+    public void handle_database_message(Database database){
+        System.out.println("Received Database message");
+        myPeer.setDatabase(database);
     }
 }

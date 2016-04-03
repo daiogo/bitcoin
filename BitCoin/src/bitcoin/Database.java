@@ -5,13 +5,14 @@
  */
 package bitcoin;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author diego
  */
-public class Database {
+public class Database implements Serializable{
     private ArrayList arrayUserInformation;
     private ArrayList arrayTransactions;
     private int numberOfUsers;
