@@ -70,9 +70,9 @@ public class MessageHandler extends Thread {
     }
     
     public void handle_hello_message(UserInformation userInformation){
-        System.out.println("Received Hello Message");
         //ignore my own message
         if(!userInformation.getUsername().equals(myPeer.getUsername())){
+            System.out.println("Received Hello Message");
             //add new user to database
             myPeer.databaseAddUserInformation(userInformation);
             myPeer.sendUnicastMessage("database", userInformation.getUnicastPort());

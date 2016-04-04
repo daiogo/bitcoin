@@ -13,13 +13,13 @@ import java.util.ArrayList;
  * @author diego
  */
 public class Database implements Serializable{
-    private ArrayList arrayUserInformation;
+    private ArrayList <UserInformation> arrayUserInformation;
     private ArrayList arrayTransactions;
     private int numberOfUsers;
     private int numberOfTransactions;
     
     public Database() {
-        this.arrayUserInformation = new ArrayList();
+        this.arrayUserInformation = new ArrayList<>();
         this.arrayTransactions = new ArrayList();
         numberOfUsers = 0;
         numberOfTransactions = 0;
