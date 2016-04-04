@@ -5,6 +5,9 @@
  */
 package bitcoin;
 
+import java.util.ArrayList;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author diego
@@ -14,8 +17,60 @@ public class PeerWindow extends javax.swing.JFrame {
     /**
      * Creates new form PeerWindow
      */
-    public PeerWindow() {
+    private DefaultTableModel tableModel;
+    private Peer myPeer;
+    
+    public PeerWindow(UserInformation myUserInformation, Peer peer) {
+        myPeer = peer;
         initComponents();
+        label_welcome.setText("Welcome "+myUserInformation.getUsername());
+        this.setTitle("BitCoin Peer");
+        createTable();
+        
+    }
+    
+    public void updateDatabase(Database database){
+        ArrayList arrayUserInformation = database.getArrayUserInformation();
+        UserInformation userInformation;
+        while(tableModel.getRowCount() > 0){
+            tableModel.removeRow(0);
+        }
+        for(int i = 0; i<arrayUserInformation.size(); i++){
+            userInformation = UserInformation.class.cast(arrayUserInformation.get(i));
+            tableModel.addRow(new Object[] {
+                userInformation.getUsername(),
+                userInformation.getCoins(),
+                userInformation.getCoinPrice(),
+                true});
+        }
+    }
+    
+    private void createTable(){
+        tableModel = (new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "User", "Coins", "Price", "PublicKey"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        
+        table_database.setModel(tableModel);
     }
 
     /**
@@ -76,7 +131,7 @@ public class PeerWindow extends javax.swing.JFrame {
 
         table_database.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null}
+
             },
             new String [] {
                 "User", "Coins", "Price", "PublicKey"
@@ -97,8 +152,12 @@ public class PeerWindow extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        table_database.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(table_database);
         if (table_database.getColumnModel().getColumnCount() > 0) {
+            table_database.getColumnModel().getColumn(0).setResizable(false);
+            table_database.getColumnModel().getColumn(1).setResizable(false);
+            table_database.getColumnModel().getColumn(2).setResizable(false);
             table_database.getColumnModel().getColumn(3).setResizable(false);
         }
 
@@ -209,10 +268,13 @@ public class PeerWindow extends javax.swing.JFrame {
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(label_command)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(button_send)
-                    .addComponent(text_field_command, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(8, 8, 8)
+                        .addComponent(text_field_command, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(button_send)))
                 .addGap(12, 12, 12)
                 .addComponent(label_message_sent)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -239,6 +301,8 @@ public class PeerWindow extends javax.swing.JFrame {
 
     private void button_exitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_exitActionPerformed
         // TODO add your handling code here:
+        myPeer.sendMessage("exit");
+        System.exit(0);
     }//GEN-LAST:event_button_exitActionPerformed
 
     /**
@@ -271,7 +335,7 @@ public class PeerWindow extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new PeerWindow().setVisible(true);
+                //new PeerWindow().setVisible(true);
             }
         });
     }

@@ -5,46 +5,88 @@
  */
 package bitcoin;
 
+import bitcoin.messages.ExitMessage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Diogo
  */
 public class MessageHandler extends Thread {
-    private byte[] buffer;
-    private Pattern usernamePattern;
-    private Pattern pricePattern;
-    private Pattern portPattern;
-    private Pattern publicKeyPattern;
-    private Matcher matcher;
+    private byte[] message;
+    private Peer myPeer;
     
-    public MessageHandler(byte[] buffer) {
-        this.buffer = buffer;
-        this.usernamePattern = Pattern.compile(",,");
-        this.pricePattern = Pattern.compile(",,");
-        this.portPattern = Pattern.compile(",\\d{4},");
-        this.publicKeyPattern = Pattern.compile(",[^,]+$");
+    public MessageHandler(byte[] message, Peer peer) {
+        this.message = message;
+        myPeer = peer;
+    }
+    
+    public static Object deserialize_object(byte[] message) {
+        ObjectInputStream objIn = null;
+        Object object = null;
+        try {
+            ByteArrayInputStream byteIn = new ByteArrayInputStream(message);
+            objIn = new ObjectInputStream(byteIn);
+            object = objIn.readObject();
+            return object;
+        } catch (IOException ex) {
+            Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                objIn.close();
+            } catch (IOException ex) {
+                Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return object;
     }
     
     public void run() {
-        String message = new String(buffer).trim();
-        System.out.println("Received: " + message);
+        Object object = deserialize_object(message);
+        String objectName = object.getClass().getName();
+        //System.out.println("Class name: " + objectName);
         
-        if (message.matches("^hello,.+$")) {
-            System.out.println("This is a hello msg");
-            // Add user to Peer's database
-            if (matcher.find()) {
-                
-            }
-        } else if (message.matches("^transaction,.*$")) {
-            System.out.println("This is a transaction msg");
-        } else {
-            System.out.println("ERROR | Message corrupted");
+        switch(objectName){
+            case "bitcoin.UserInformation":
+                //Hello message
+                handle_hello_message(UserInformation.class.cast(object));
+                break;
+            case "bitcoin.Database":
+                handle_database_message(Database.class.cast(object));
+                break;
+            case "bitcoin.messages.ExitMessage":
+                handle_exit_message(ExitMessage.class.cast(object));
+                break;
+            default:
+                System.out.println("Message received class not found: " + objectName);
+                break;
         }
-        
-        
+    }
+    
+    public void handle_hello_message(UserInformation userInformation){
+        System.out.println("Received Hello Message");
+        //ignore my own message
+        if(!userInformation.getUsername().equals(myPeer.getUsername())){
+            //add new user to database
+            myPeer.databaseAddUserInformation(userInformation);
+            myPeer.sendMessage("database");
+        }
+    }
+    
+    public void handle_database_message(Database database){
+        System.out.println("Received Database message");
+        myPeer.setDatabase(database);
+    }
+    
+    public void handle_exit_message(ExitMessage exitMessage){
+        System.out.println("Received Exit Message");
+        myPeer.databaseRemoveUserInformation(exitMessage.getUserInformation());
     }
 }

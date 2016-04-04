@@ -12,6 +12,8 @@ import java.security.*;
 import javax.crypto.*;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  *
  * @author diego
@@ -24,32 +26,46 @@ public class Peer {
     private SignatureVerifier signatureVerifier;
     private Database database;
     private UserInformation myUserInformation;
-    private MessageSender sender;
+    private MessageSender messageSender;
     private MessageListener receiver;
     private boolean exit;
     private Scanner scanner;
     private String command;
     private String username;
-    private int unicast_port;
+    private int unicastPort;
     private String coinPrice;
     private PeerWindow peerWindow;
+    private InetAddress group;
+    private MulticastSocket multicastSocket = null;
     
-    public Peer(String username, String unicast_port, String coinPrice){
+    public Peer(String username, int unicastPort, String coinPrice){
         System.out.println("Peer Constructor");
 //        this.keyHolder = new KeyHolder();
 //        this.verifier = new SignatureVerifier();
 //        this.wallets = new ArrayList();
 //        this.myWallet = new Wallet(username, 100, this.keyHolder.getNotEncodedPublicKey());
         this.username = username;
-        this.unicast_port = Integer.parseInt(unicast_port);
+        this.unicastPort = unicastPort;
         this.scanner = new Scanner(System.in);
         this.wallet = new Wallet();
         this.signatureVerifier = new SignatureVerifier();
         this.database = new Database();
-        this.myUserInformation = new UserInformation(username, 100, this.wallet.getPublicKey());
-        this.database.getArrayUserInformation().add(this.myUserInformation);
+        this.myUserInformation = new UserInformation(username, 100,coinPrice, unicastPort ,this.wallet.getPublicKey());
+        this.database.addUserInformation(myUserInformation);
         this.coinPrice = coinPrice;
-        peerWindow = new PeerWindow();
+        peerWindow = new PeerWindow(myUserInformation, this);
+        peerWindow.setVisible(true);
+        updateDatabaseTable();
+    }
+    
+    public synchronized void databaseAddUserInformation(UserInformation userInformation){
+        database.addUserInformation(userInformation);
+        peerWindow.updateDatabase(database);
+    }
+    
+    public synchronized void databaseRemoveUserInformation(UserInformation userInformation){
+        database.removeUserInformation(userInformation);
+        peerWindow.updateDatabase(database);
     }
     
     public void test_signature(){
@@ -60,59 +76,81 @@ public class Peer {
     }
     
     public void init_peer() {
-        MulticastSocket multicastSocket = null;
-        peerWindow.setVisible(true);
-        
         try {
             // Sets group settings and join multicast group
-            InetAddress group = InetAddress.getByName(GROUP_IP);
+            group = InetAddress.getByName(GROUP_IP);
             multicastSocket = new MulticastSocket(MULTICAST_PORT);
             multicastSocket.joinGroup(group);
             
             // Starts MessageListener thread
-            receiver = new MessageListener(multicastSocket);
+            receiver = new MessageListener(multicastSocket, this);
             receiver.start();
             
             // Sends Hello Message at the start to the multicast group
-            sender = new MessageSender(multicastSocket);
+            messageSender = new MessageSender(multicastSocket);
             System.out.println("I have just entered in this group! Sending Hello Message!");
-            sender.sendHello(username,coinPrice,unicast_port,wallet.getEncodedPublicKey());
-
-            while (exit == false) {
-                System.out.println("Please enter your command:");
-                command = scanner.nextLine();
-                
-                switch (command) {
-                    case "exit":
-                        exit = true;
-                        receiver.setExit(exit);
-                        System.out.println("Exiting...");
-                        break;
-                    case "help":
-                        System.out.println("Commands Help:");
-                        break;
-                    case "transaction":
-                        //if (database.getNumberOfUsers() >= MIN_USERS) {
-                            this.sender = new MessageSender(multicastSocket);
-                            sender.sendTransaction();
-                        //} else {
-                        //    System.out.println("ERROR | You may only perform a transaction when at least 4 users are in the network.");
-                        //    System.out.println("      | There are currently " + database.getNumberOfUsers() + " users.");
-                        //}
-                        break;
-                    default:
-                        System.out.println("ERROR | Command not found");
-                        break;
-                }
-            }
-            
-            // Exit program
-            multicastSocket.leaveGroup(group);
-        } catch (Exception e) {
-            System.out.println("Peer Start Exception: " + e.getMessage());
-        } finally {
-            if (multicastSocket != null)
-                multicastSocket.close();
+            sendMessage("hello");
+            exit = false;
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }    
+    }
+
+    public void sendMessage(String command) {
+        try{
+            switch (command) {
+                case "hello":
+                    messageSender.sendHello(myUserInformation);
+                    break;
+                case "database":
+                    messageSender.sendDatabase(database);
+                    break;
+                case "exit":
+                    messageSender.sendExit(myUserInformation);
+                    exit = true;
+                    receiver.setExit(exit);
+                    System.out.println("Exiting...");
+                    break;
+                case "help":
+                    System.out.println("Commands Help:");
+                    break;
+                case "transaction":
+                    //if (database.getNumberOfUsers() >= MIN_USERS) {
+                        //sender = new MessageSender(multicastSocket);
+                        messageSender.sendTransaction();
+                    //} else {
+                    //    System.out.println("ERROR | You may only perform a transaction when at least 4 users are in the network.");
+                    //    System.out.println("      | There are currently " + database.getNumberOfUsers() + " users.");
+                    //}
+                    break;
+                default:
+                    System.out.println("ERROR | Command not found");
+                    break;
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(PeerWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public String getUsername(){
+        return username;
+    }
+    
+    public void exitProgram() throws IOException{
+        // Exit program
+        multicastSocket.leaveGroup(group);
+        if (multicastSocket != null)
+            multicastSocket.close();
+    }
+    
+    public synchronized void setDatabase(Database database){
+        this.database = database;
+        updateDatabaseTable();
+    }
+    
+    public synchronized void updateDatabaseTable(){
+        peerWindow.updateDatabase(database);
+    }
 }

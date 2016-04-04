@@ -5,28 +5,43 @@
  */
 package bitcoin;
 
+import java.io.Serializable;
 import java.security.PublicKey;
 
 /**
  *
  * @author Diogo
  */
-public class UserInformation {
+public class UserInformation implements Serializable{
     private String username;
     private int coins;
     private PublicKey publicKey;
+    private int unicastPort;
+    private String coinPrice;
     
-    public UserInformation(String username, int coins, PublicKey publicKey) {
+    
+    public UserInformation(String username, int coins, String coinPrice,
+            int unicast_port, PublicKey publicKey) {
         this.username = username;
         this.coins = coins;
         this.publicKey = publicKey;
+        this.unicastPort = unicast_port;
+        this.coinPrice = coinPrice;
     }
 
     public String getUsername() {
         return username;
     }
+    
+    public String getCoinPrice() {
+        return coinPrice;
+    }
 
     public int getCoins() {
+        return coins;
+    }
+    
+    public int getUnicastPort() {
         return coins;
     }
 

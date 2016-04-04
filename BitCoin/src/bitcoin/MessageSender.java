@@ -7,12 +7,15 @@ package bitcoin;
 
 import static bitcoin.Peer.GROUP_IP;
 import static bitcoin.Peer.MULTICAST_PORT;
+import bitcoin.messages.ExitMessage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
-import java.util.Arrays;
+import java.security.PublicKey;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,58 +34,54 @@ public class MessageSender {
     private DatagramPacket outPacket;
     private InetAddress group;
     private MulticastSocket socket;
-        
+    
     public MessageSender(MulticastSocket socket) throws UnknownHostException {
         this.socket = socket;
-        this.group = InetAddress.getByName(GROUP_IP);
+        this.group = InetAddress.getByName(GROUP_IP);    
     }
     
-    public void sendHello(String username, String coinPrice, int unicast_port, byte[] encodedPublicKey) throws IOException {
-        String message = "hello," + username + "," + coinPrice + ","
-                + Integer.toString(unicast_port) + "," + Arrays.toString(encodedPublicKey);      
-        //System.out.println("Hello message to send: "+message);
-        byte[] messageBytes = message.getBytes();
+    public static byte[] serialize_object(Object object){
+        byte[] serialized_object = null;
+        try {
+            ObjectOutputStream objectOut = null;
+            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+            objectOut = new ObjectOutputStream(byteOut);
+            objectOut.writeObject(object);
+            serialized_object = byteOut.toByteArray();
+            return serialized_object;
+        } catch (IOException ex) {
+            Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return serialized_object;
+    }   
+    
+    public void sendHello(UserInformation userInformation)throws IOException {        
+        byte[] messageBytes = serialize_object(userInformation);
         
         outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
         socket.send(outPacket);
     }
+    
+    public void sendDatabase(Database database)throws IOException {        
+        byte[] messageBytes = serialize_object(database);
+        
+        outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
+        socket.send(outPacket);
+    }
+    
+    public void sendExit(UserInformation userInformation)throws IOException {   
+        ExitMessage exitMessage = new ExitMessage(userInformation);
+        byte[] messageBytes = serialize_object(exitMessage);
+        
+        outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
+        socket.send(outPacket);
+    }
+    
     
     public void sendTransaction() throws IOException {
         byte[] m = "transaction,".getBytes();
         outPacket = new DatagramPacket(m, m.length, group, MULTICAST_PORT);
         socket.send(outPacket);
     }
-    
-    /*
-    @Override
-    public void run() {
-        // Parse message
-        // Define protocol like 
-        // Eg. hello|public key|coins|...
-        //messageType = message.matches("^[a-z]+|");
-        String messageType = "hello";
-        
-        try {
-            switch (messageType) {
-                case "hello":
-                    sendHello(message.getBytes());
-                    break;
-                case "trasaction":
-                    sendTransaction(message.getBytes());
-                    break;
-                default:
-                    System.out.println("ERROR | Message to be sent doesn't follow messaging protocol");
-                    break;
-            }
-<<<<<<< HEAD
-            
-=======
 
-            //socket.close();
->>>>>>> a4fdb5b2b839ea6e85a88c92ad9607bf0968d255
-        } catch (IOException ex) {
-            Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    */
 }
