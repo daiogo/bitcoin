@@ -3,21 +3,34 @@ package bitcoin;
 import java.net.*;
 import java.io.*;
 
-public class UDPServer{
+public class UDPServer extends Thread{
     
-    public void start_server(){ 
+    public static final int MAX_UDP_MESSAGE_SIZE = 65535;
+    private MessageHandler handler;
+    private Peer myPeer;
+    private int unicastPort;
+    
+    public UDPServer(int unicastPort, Peer peer){
+        myPeer = peer;
+        this.unicastPort = unicastPort;
+    }
+    
+    public void run(){ 
         DatagramSocket aSocket = null;
+        System.out.println("UDP Server Started on port " + unicastPort);
         try{
-            aSocket = new DatagramSocket(6789);
+            aSocket = new DatagramSocket(unicastPort);
             // create socket at agreed port
-            byte[] buffer = new byte[1000];
+            byte[] buffer = new byte[MAX_UDP_MESSAGE_SIZE];
             while(true){
-                    DatagramPacket request = new DatagramPacket(buffer, buffer.length);
-                    aSocket.receive(request);     
-            DatagramPacket reply = new DatagramPacket(request.getData(), request.getLength(), 
+                DatagramPacket request = new DatagramPacket(buffer, buffer.length);
+                aSocket.receive(request);     
+                DatagramPacket inPacket = new DatagramPacket(request.getData(), request.getLength(), 
                     request.getAddress(), request.getPort());
-            aSocket.send(reply);
-        }
+                System.out.println("Unicast Message Received");
+                handler = new MessageHandler(inPacket.getData(), myPeer);
+                handler.start();
+            }
         }catch (SocketException e){System.out.println("Socket: " + e.getMessage());
         }catch (IOException e) {System.out.println("IO: " + e.getMessage());
         }finally {if(aSocket != null) aSocket.close();}

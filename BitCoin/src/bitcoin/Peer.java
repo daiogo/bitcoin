@@ -82,14 +82,16 @@ public class Peer {
             multicastSocket = new MulticastSocket(MULTICAST_PORT);
             multicastSocket.joinGroup(group);
             
-            // Starts MessageListener thread
+            // Starts MessageListener Multicast thread
             receiver = new MessageListener(multicastSocket, this);
             receiver.start();
             
+            receiver.startUDPServer(unicastPort);
+            //System.out.println("Init Peer unicastPort: "+unicastPort);
             // Sends Hello Message at the start to the multicast group
             messageSender = new MessageSender(multicastSocket);
             System.out.println("I have just entered in this group! Sending Hello Message!");
-            sendMessage("hello");
+            sendMulticastMessage("hello");
             exit = false;
         } catch (UnknownHostException ex) {
             Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
@@ -98,14 +100,11 @@ public class Peer {
         }
     }
 
-    public void sendMessage(String command) {
+    public void sendMulticastMessage(String command) {
         try{
             switch (command) {
                 case "hello":
                     messageSender.sendHello(myUserInformation);
-                    break;
-                case "database":
-                    messageSender.sendDatabase(database);
                     break;
                 case "exit":
                     messageSender.sendExit(myUserInformation);
@@ -133,6 +132,18 @@ public class Peer {
             Logger.getLogger(PeerWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public void sendUnicastMessage(String command, int unicastPort){
+        try {
+            switch (command) {
+                case "database":
+                messageSender.sendDatabase(database, unicastPort);
+            }    
+        } catch (IOException ex) {
+            Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     
     public String getUsername(){
         return username;

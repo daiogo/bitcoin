@@ -37,7 +37,7 @@ public class MessageSender {
     
     public MessageSender(MulticastSocket socket) throws UnknownHostException {
         this.socket = socket;
-        this.group = InetAddress.getByName(GROUP_IP);    
+        this.group = InetAddress.getByName(GROUP_IP);   
     }
     
     public static byte[] serialize_object(Object object){
@@ -62,11 +62,10 @@ public class MessageSender {
         socket.send(outPacket);
     }
     
-    public void sendDatabase(Database database)throws IOException {        
+    public void sendDatabase(Database database, int unicastPort)throws IOException {        
         byte[] messageBytes = serialize_object(database);
-        
-        outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
-        socket.send(outPacket);
+        UDPClient udpClient = new UDPClient(unicastPort);
+        udpClient.sendDatabase(messageBytes);
     }
     
     public void sendExit(UserInformation userInformation)throws IOException {   

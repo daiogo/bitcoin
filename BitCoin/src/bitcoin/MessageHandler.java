@@ -9,7 +9,6 @@ import bitcoin.messages.ExitMessage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -76,7 +75,7 @@ public class MessageHandler extends Thread {
         if(!userInformation.getUsername().equals(myPeer.getUsername())){
             //add new user to database
             myPeer.databaseAddUserInformation(userInformation);
-            myPeer.sendMessage("database");
+            myPeer.sendUnicastMessage("database", userInformation.getUnicastPort());
         }
     }
     

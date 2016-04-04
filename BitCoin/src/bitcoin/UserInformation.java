@@ -42,7 +42,7 @@ public class UserInformation implements Serializable{
     }
     
     public int getUnicastPort() {
-        return coins;
+        return unicastPort;
     }
 
     public PublicKey getPublicKey() {

@@ -301,7 +301,7 @@ public class PeerWindow extends javax.swing.JFrame {
 
     private void button_exitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_exitActionPerformed
         // TODO add your handling code here:
-        myPeer.sendMessage("exit");
+        myPeer.sendMulticastMessage("exit");
         System.exit(0);
     }//GEN-LAST:event_button_exitActionPerformed
 
