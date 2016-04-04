@@ -79,7 +79,7 @@ public class MessageHandler extends Thread {
         }
     }
     
-    public void handle_database_message(Database database){
+    public synchronized void handle_database_message(Database database){
         System.out.println("Received Database message");
         myPeer.setDatabase(database);
     }

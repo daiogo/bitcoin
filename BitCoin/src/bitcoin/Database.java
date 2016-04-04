@@ -62,6 +62,12 @@ public class Database implements Serializable{
         return numberOfTransactions;
     }
 
+    public void printDatabase(){
+        System.out.println("Print Database: ");
+        for (int i=0; i<arrayUserInformation.size();i++){
+            System.out.println(arrayUserInformation.get(i).getUsername());
+        }    
+    }
    
     
 }

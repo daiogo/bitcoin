@@ -29,12 +29,10 @@ public class PeerWindow extends javax.swing.JFrame {
         
     }
     
-    public void updateDatabase(Database database){
+    public synchronized void updateDatabase(Database database){
         ArrayList arrayUserInformation = database.getArrayUserInformation();
         UserInformation userInformation;
-        while(tableModel.getRowCount() > 0){
-            tableModel.removeRow(0);
-        }
+        createTable();
         for(int i = 0; i<arrayUserInformation.size(); i++){
             userInformation = UserInformation.class.cast(arrayUserInformation.get(i));
             tableModel.addRow(new Object[] {
@@ -45,8 +43,8 @@ public class PeerWindow extends javax.swing.JFrame {
         }
     }
     
-    private void createTable(){
-        tableModel = (new javax.swing.table.DefaultTableModel(
+    private synchronized void createTable(){
+        DefaultTableModel tempTableModel = (new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -77,6 +75,8 @@ public class PeerWindow extends javax.swing.JFrame {
             table_database.getColumnModel().getColumn(2).setResizable(false);
         }
         
+        tableModel = new DefaultTableModel();
+        tableModel = tempTableModel;
         table_database.setModel(tableModel);
     }
 

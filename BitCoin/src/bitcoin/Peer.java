@@ -37,6 +37,7 @@ public class Peer {
     private PeerWindow peerWindow;
     private InetAddress group;
     private MulticastSocket multicastSocket = null;
+    private DebugThread debugThread;
     
     public Peer(String username, int unicastPort, String coinPrice){
         System.out.println("Peer Constructor");
@@ -56,6 +57,7 @@ public class Peer {
         peerWindow = new PeerWindow(myUserInformation, this);
         peerWindow.setVisible(true);
         updateDatabaseTable();
+        System.out.println("End Peer Constructor");
     }
     
     public synchronized void databaseAddUserInformation(UserInformation userInformation){
@@ -98,6 +100,8 @@ public class Peer {
         } catch (IOException ex) {
             Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
         }
+        debugThread = new DebugThread(this);
+        debugThread.start();
     }
 
     public void sendMulticastMessage(String command) {
@@ -164,4 +168,9 @@ public class Peer {
     public synchronized void updateDatabaseTable(){
         peerWindow.updateDatabase(database);
     }
+    
+    public void printDatabase(){
+        database.printDatabase();
+    }
+    
 }
