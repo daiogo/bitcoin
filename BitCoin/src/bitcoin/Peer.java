@@ -5,6 +5,7 @@
  */
 package bitcoin;
 
+import bitcoin.messages.BuyMessage;
 import java.net.*;
 import java.io.*;
 import java.security.*;
@@ -41,7 +42,7 @@ public class Peer {
     private DebugThread debugThread;
     static Semaphore mutex = new Semaphore(1);
     
-    public Peer(String username, int unicastPort, String coinPrice){
+    public Peer(String username, int unicastPort, String coinPrice) {
         System.out.println("Peer Constructor");
 //        this.keyHolder = new KeyHolder();
 //        this.verifier = new SignatureVerifier();
@@ -113,8 +114,7 @@ public class Peer {
                     break;
                 case "transaction":
                     //if (database.getNumberOfUsers() >= MIN_USERS) {
-                        //sender = new MessageSender(multicastSocket);
-                        messageSender.sendTransaction();
+//-->                        //messageSender.sendTransaction();
                     //} else {
                     //    System.out.println("ERROR | You may only perform a transaction when at least 4 users are in the network.");
                     //    System.out.println("      | There are currently " + database.getNumberOfUsers() + " users.");
@@ -129,11 +129,18 @@ public class Peer {
         }
     }
     
-    public void sendUnicastMessage(String command, int unicastPort){
+    public void sendUnicastMessage(String command, int unicastPort, String seller, int coins){
         try {
             switch (command) {
                 case "database":
-                messageSender.sendDatabase(database, unicastPort);
+                    messageSender.sendDatabase(database, unicastPort);
+                    break;
+                case "buy":
+                    BuyMessage buyMessage = new BuyMessage(coins, seller);
+                    messageSender.sendBuy(buyMessage, unicastPort);
+                    break;
+                default:
+                    
             }    
         } catch (IOException ex) {
             Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
@@ -202,4 +209,7 @@ public class Peer {
         database.printDatabase();
     }
     
+    public Database getDatabase() {
+        return database;
+    }
 }

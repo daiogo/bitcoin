@@ -13,7 +13,7 @@ public class UDPClient{
     }
     
     
-    public void sendDatabase(byte[] byteDatabase){ 
+    public void sendDatabase(byte[] byteDatabase) { 
         // args give message contents and destination hostname
         DatagramSocket aSocket = null;
         try {
@@ -22,11 +22,27 @@ public class UDPClient{
             int serverPort = unicastPort;		                                                 
             DatagramPacket request =
                     new DatagramPacket(byteDatabase, byteDatabase.length, aHost, serverPort);
-            aSocket.send(request);		
+            aSocket.send(request);
             System.out.println("Database Message Sent to "+ unicastPort);
 	
         }catch (SocketException e){System.out.println("Socket: " + e.getMessage());
         }catch (IOException e){System.out.println("IO: " + e.getMessage());
         }finally {if(aSocket != null) aSocket.close();}
-    }		      	
+    }	
+    
+    public void sendBuy(byte[] buyMessage) {  
+        DatagramSocket aSocket = null;
+        try {
+            aSocket = new DatagramSocket();    
+            InetAddress aHost = InetAddress.getByName("localhost");
+            int serverPort = unicastPort;		                                                 
+            DatagramPacket request =
+                    new DatagramPacket(buyMessage, buyMessage.length, aHost, serverPort);
+            aSocket.send(request);
+            System.out.println("Database Message Sent to "+ unicastPort);
+	
+        }catch (SocketException e){System.out.println("Socket: " + e.getMessage());
+        }catch (IOException e){System.out.println("IO: " + e.getMessage());
+        }finally {if(aSocket != null) aSocket.close();}
+    }
 }

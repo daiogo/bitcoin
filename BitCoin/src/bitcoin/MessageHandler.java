@@ -5,6 +5,7 @@
  */
 package bitcoin;
 
+import bitcoin.messages.BuyMessage;
 import bitcoin.messages.ExitMessage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -64,6 +65,9 @@ public class MessageHandler extends Thread{
             case "bitcoin.messages.ExitMessage":
                 handle_exit_message(ExitMessage.class.cast(object));
                 break;
+            case "bitcoin.messages.BuyMessage":
+                handleBuyMessage(BuyMessage.class.cast(object));
+                break;
             default:
                 System.out.println("Message received class not found: " + objectName);
                 break;
@@ -76,7 +80,7 @@ public class MessageHandler extends Thread{
             System.out.println("Received Hello Message");
             //add new user to database
             myPeer.databaseAddUserInformation(userInformation);
-            myPeer.sendUnicastMessage("database", userInformation.getUnicastPort());
+            myPeer.sendUnicastMessage("database", userInformation.getUnicastPort(), "", 0);
         }
     }
     
@@ -88,5 +92,13 @@ public class MessageHandler extends Thread{
     public void handle_exit_message(ExitMessage exitMessage){
         System.out.println("Received Exit Message");
         myPeer.databaseRemoveUserInformation(exitMessage.getUserInformation());
+    }
+    
+    public void handleBuyMessage(BuyMessage buyMessage){
+        System.out.println("Received Buy Message");
+        System.out.println("User " + buyMessage.getBuyer() + " wants to buy " + buyMessage.getCoins() + " coins.");
+        
+        // Create transaction message
+        
     }
 }

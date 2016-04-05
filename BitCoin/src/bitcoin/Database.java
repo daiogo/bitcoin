@@ -44,6 +44,16 @@ public class Database implements Serializable{
         }
         
     }
+    
+    public int getUnicastPort(String username) {
+        for (int i=0; i < arrayUserInformation.size(); i++) {
+            UserInformation temp = (UserInformation) arrayUserInformation.get(i);
+            if (temp.getUsername().equals(username)) {
+                return temp.getUnicastPort();
+            }
+        }
+        return 0;
+    }
 
     public ArrayList getArrayUserInformation() {
         return arrayUserInformation;
@@ -68,6 +78,5 @@ public class Database implements Serializable{
             System.out.println(arrayUserInformation.get(i).getUsername());
         }    
     }
-   
-    
+
 }
