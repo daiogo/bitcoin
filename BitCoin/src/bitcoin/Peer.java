@@ -12,6 +12,7 @@ import java.security.*;
 import javax.crypto.*;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 /**
@@ -38,6 +39,7 @@ public class Peer {
     private InetAddress group;
     private MulticastSocket multicastSocket = null;
     private DebugThread debugThread;
+    static Semaphore mutex = new Semaphore(1);
     
     public Peer(String username, int unicastPort, String coinPrice){
         System.out.println("Peer Constructor");
@@ -58,16 +60,6 @@ public class Peer {
         peerWindow.setVisible(true);
         updateDatabaseTable();
         System.out.println("End Peer Constructor");
-    }
-    
-    public synchronized void databaseAddUserInformation(UserInformation userInformation){
-        database.addUserInformation(userInformation);
-        peerWindow.updateDatabase(database);
-    }
-    
-    public synchronized void databaseRemoveUserInformation(UserInformation userInformation){
-        database.removeUserInformation(userInformation);
-        peerWindow.updateDatabase(database);
     }
     
     public void test_signature(){
@@ -161,8 +153,45 @@ public class Peer {
     }
     
     public synchronized void setDatabase(Database database){
-        this.database = database;
-        updateDatabaseTable();
+        try {
+            mutex.acquire();
+            try {
+                this.database = database;
+                updateDatabaseTable();
+            } finally {
+                mutex.release();
+            }
+        } catch(InterruptedException ie) {
+            Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ie);
+        }
+    }
+    
+    public synchronized void databaseAddUserInformation(UserInformation userInformation){
+        try {
+            mutex.acquire();
+            try {
+                database.addUserInformation(userInformation);
+                peerWindow.updateDatabase(database);
+            } finally {
+                mutex.release();
+            }
+        } catch(InterruptedException ie) {
+            Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ie);
+        }
+    }
+    
+    public synchronized void databaseRemoveUserInformation(UserInformation userInformation){
+        try {
+            mutex.acquire();
+            try {
+                database.removeUserInformation(userInformation);
+                peerWindow.updateDatabase(database);
+            } finally {
+                mutex.release();
+            }
+        } catch(InterruptedException ie) {
+            Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ie);
+        }
     }
     
     public synchronized void updateDatabaseTable(){

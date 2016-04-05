@@ -76,7 +76,6 @@ public class MessageSender {
         socket.send(outPacket);
     }
     
-    
     public void sendTransaction() throws IOException {
         byte[] m = "OLA BOCOS".getBytes();
         outPacket = new DatagramPacket(m, m.length, group, MULTICAST_PORT);

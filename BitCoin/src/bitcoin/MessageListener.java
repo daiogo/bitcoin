@@ -48,7 +48,7 @@ public class MessageListener extends Thread {
                 byte buffer[] = new byte[MAX_UDP_MESSAGE_SIZE];
                 inPacket = new DatagramPacket(buffer, buffer.length);
                 socket.receive(inPacket);
-                System.out.println("Received Multicast Message");
+                //System.out.println("Received Multicast Message");
                 MessageHandler handler = new MessageHandler(inPacket.getData(), myPeer);
                 handler.start();
             } catch (IOException ex) {
