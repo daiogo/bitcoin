@@ -50,7 +50,6 @@ public class Peer {
 //        this.myWallet = new Wallet(username, 100, this.keyHolder.getNotEncodedPublicKey());
         this.username = username;
         this.unicastPort = unicastPort;
-        this.scanner = new Scanner(System.in);
         this.wallet = new Wallet();
         this.signatureVerifier = new SignatureVerifier();
         this.database = new Database();
@@ -136,7 +135,7 @@ public class Peer {
                     messageSender.sendDatabase(database, unicastPort);
                     break;
                 case "buy":
-                    BuyMessage buyMessage = new BuyMessage(coins, seller);
+                    BuyMessage buyMessage = new BuyMessage(coins, username ,seller);
                     messageSender.sendBuy(buyMessage, unicastPort);
                     break;
                 default:

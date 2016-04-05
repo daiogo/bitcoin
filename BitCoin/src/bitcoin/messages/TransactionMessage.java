@@ -5,10 +5,14 @@
  */
 package bitcoin.messages;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Diogo
  */
-public class TransactionMessage {
+public class TransactionMessage implements Serializable{
+    private BuyMessage buyMessage;
+    private byte[] encryptedBuyMessage;
     
 }

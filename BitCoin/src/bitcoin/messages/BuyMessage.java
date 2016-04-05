@@ -13,18 +13,24 @@ import java.io.Serializable;
  */
 public class BuyMessage implements Serializable {
     private int coins;
-    private String buyer;
+    private String buyerUsername;
+    private String sellerUsername;
     
-    public BuyMessage(int coins, String buyer) {
+    public BuyMessage(int coins, String buyerUsername, String sellerUsername) {
         this.coins = coins;
-        this.buyer = buyer;
+        this.buyerUsername = buyerUsername;
+        this.sellerUsername = sellerUsername;
     }
     
     public int getCoins() {
         return coins;
     }
     
-    public String getBuyer() {
-        return buyer;
+    public String getBuyerUsername() {
+        return buyerUsername;
+    }
+    
+    public String getSellerUsername() {
+        return sellerUsername;
     }
 }

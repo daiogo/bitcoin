@@ -54,7 +54,6 @@ public class MessageListener extends Thread {
             } catch (IOException ex) {
                 Logger.getLogger(MessageListener.class.getName()).log(Level.SEVERE, null, ex);
             }
-
         }
         System.out.println("Receiver thread finished");
     }

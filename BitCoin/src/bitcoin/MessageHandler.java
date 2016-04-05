@@ -96,7 +96,9 @@ public class MessageHandler extends Thread{
     
     public void handleBuyMessage(BuyMessage buyMessage){
         System.out.println("Received Buy Message");
-        System.out.println("User " + buyMessage.getBuyer() + " wants to buy " + buyMessage.getCoins() + " coins.");
+        System.out.println("User " + buyMessage.getBuyerUsername() + 
+                " wants to buy " + buyMessage.getCoins() + " coins." +
+                "from: "+buyMessage.getSellerUsername());
         
         // Create transaction message
         
