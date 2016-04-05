@@ -25,7 +25,7 @@ public class BitCoin {
         }
         Random random = new Random();
         try {
-            Thread.sleep(random.nextInt(1000)+100);
+            Thread.sleep(random.nextInt(3000)+500);
         } catch (InterruptedException ex) {
             Logger.getLogger(BitCoin.class.getName()).log(Level.SEVERE, null, ex);
         }

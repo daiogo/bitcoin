@@ -12,7 +12,7 @@ import java.security.PublicKey;
  *
  * @author Diogo
  */
-public class UserInformation implements Serializable{
+public class UserInformation implements Serializable {
     private String username;
     private int coins;
     private PublicKey publicKey;
@@ -21,12 +21,13 @@ public class UserInformation implements Serializable{
     
     
     public UserInformation(String username, int coins, String coinPrice,
-            int unicast_port, PublicKey publicKey) {
+            int unicastPort, PublicKey publicKey) {
         this.username = username;
         this.coins = coins;
         this.publicKey = publicKey;
-        this.unicastPort = unicast_port;
+        this.unicastPort = unicastPort;
         this.coinPrice = coinPrice;
+        this.unicastPort = unicastPort;
     }
 
     public String getUsername() {
@@ -42,7 +43,7 @@ public class UserInformation implements Serializable{
     }
     
     public int getUnicastPort() {
-        return coins;
+        return unicastPort;
     }
 
     public PublicKey getPublicKey() {
@@ -59,5 +60,9 @@ public class UserInformation implements Serializable{
 
     public void setPublicKey(PublicKey publicKey) {
         this.publicKey = publicKey;
+    }
+    
+    public void setUnicastPort(int unicastPort) {
+        this.unicastPort = unicastPort;
     }
 }

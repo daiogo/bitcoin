@@ -23,11 +23,18 @@ public class MessageListener extends Thread {
     private MulticastSocket socket;
     private boolean exit;
     private Peer myPeer;
+    private UDPServer udpServer;
         
     public MessageListener(MulticastSocket socket, Peer peer) throws UnknownHostException {
         this.socket = socket;
         this.exit = false;
         myPeer = peer;
+    }
+    
+    public void startUDPServer(int unicastPort){
+        udpServer = new UDPServer(unicastPort, myPeer);
+        udpServer.start();        
+        
     }
     
     public void setExit(boolean exit) {

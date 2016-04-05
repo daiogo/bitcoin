@@ -7,6 +7,7 @@ package bitcoin;
 
 import static bitcoin.Peer.GROUP_IP;
 import static bitcoin.Peer.MULTICAST_PORT;
+import bitcoin.messages.BuyMessage;
 import bitcoin.messages.ExitMessage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -37,7 +38,7 @@ public class MessageSender {
     
     public MessageSender(MulticastSocket socket) throws UnknownHostException {
         this.socket = socket;
-        this.group = InetAddress.getByName(GROUP_IP);    
+        this.group = InetAddress.getByName(GROUP_IP);   
     }
     
     public static byte[] serialize_object(Object object){
@@ -62,11 +63,10 @@ public class MessageSender {
         socket.send(outPacket);
     }
     
-    public void sendDatabase(Database database)throws IOException {        
+    public void sendDatabase(Database database, int unicastPort)throws IOException {        
         byte[] messageBytes = serialize_object(database);
-        
-        outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
-        socket.send(outPacket);
+        UDPClient udpClient = new UDPClient(unicastPort);
+        udpClient.sendDatabase(messageBytes);
     }
     
     public void sendExit(UserInformation userInformation)throws IOException {   
@@ -78,10 +78,10 @@ public class MessageSender {
     }
     
     
-    public void sendTransaction() throws IOException {
-        byte[] m = "transaction,".getBytes();
-        outPacket = new DatagramPacket(m, m.length, group, MULTICAST_PORT);
-        socket.send(outPacket);
+    public void sendBuy(BuyMessage buyMessage, int unicastPort) throws IOException {
+        byte[] messageBytes = serialize_object(buyMessage);
+        UDPClient udpClient = new UDPClient(unicastPort);
+        udpClient.sendDatabase(messageBytes);
     }
 
 }

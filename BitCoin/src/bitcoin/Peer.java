@@ -5,6 +5,7 @@
  */
 package bitcoin;
 
+import bitcoin.messages.BuyMessage;
 import java.net.*;
 import java.io.*;
 import java.security.*;
@@ -37,8 +38,9 @@ public class Peer {
     private PeerWindow peerWindow;
     private InetAddress group;
     private MulticastSocket multicastSocket = null;
+    private DebugThread debugThread;
     
-    public Peer(String username, int unicastPort, String coinPrice){
+    public Peer(String username, int unicastPort, String coinPrice) {
         System.out.println("Peer Constructor");
 //        this.keyHolder = new KeyHolder();
 //        this.verifier = new SignatureVerifier();
@@ -56,6 +58,7 @@ public class Peer {
         peerWindow = new PeerWindow(myUserInformation, this);
         peerWindow.setVisible(true);
         updateDatabaseTable();
+        System.out.println("End Peer Constructor");
     }
     
     public synchronized void databaseAddUserInformation(UserInformation userInformation){
@@ -82,30 +85,31 @@ public class Peer {
             multicastSocket = new MulticastSocket(MULTICAST_PORT);
             multicastSocket.joinGroup(group);
             
-            // Starts MessageListener thread
+            // Starts MessageListener Multicast thread
             receiver = new MessageListener(multicastSocket, this);
             receiver.start();
             
+            receiver.startUDPServer(unicastPort);
+            //System.out.println("Init Peer unicastPort: "+unicastPort);
             // Sends Hello Message at the start to the multicast group
             messageSender = new MessageSender(multicastSocket);
             System.out.println("I have just entered in this group! Sending Hello Message!");
-            sendMessage("hello");
+            sendMulticastMessage("hello");
             exit = false;
         } catch (UnknownHostException ex) {
             Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
         }
+        debugThread = new DebugThread(this);
+        debugThread.start();
     }
 
-    public void sendMessage(String command) {
+    public void sendMulticastMessage(String command) {
         try{
             switch (command) {
                 case "hello":
                     messageSender.sendHello(myUserInformation);
-                    break;
-                case "database":
-                    messageSender.sendDatabase(database);
                     break;
                 case "exit":
                     messageSender.sendExit(myUserInformation);
@@ -118,8 +122,7 @@ public class Peer {
                     break;
                 case "transaction":
                     //if (database.getNumberOfUsers() >= MIN_USERS) {
-                        //sender = new MessageSender(multicastSocket);
-                        messageSender.sendTransaction();
+//-->                        //messageSender.sendTransaction();
                     //} else {
                     //    System.out.println("ERROR | You may only perform a transaction when at least 4 users are in the network.");
                     //    System.out.println("      | There are currently " + database.getNumberOfUsers() + " users.");
@@ -133,6 +136,25 @@ public class Peer {
             Logger.getLogger(PeerWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public void sendUnicastMessage(String command, int unicastPort, String seller, int coins){
+        try {
+            switch (command) {
+                case "database":
+                    messageSender.sendDatabase(database, unicastPort);
+                    break;
+                case "buy":
+                    BuyMessage buyMessage = new BuyMessage(coins, seller);
+                    messageSender.sendBuy(buyMessage, unicastPort);
+                    break;
+                default:
+                    
+            }    
+        } catch (IOException ex) {
+            Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     
     public String getUsername(){
         return username;
@@ -152,5 +174,13 @@ public class Peer {
     
     public synchronized void updateDatabaseTable(){
         peerWindow.updateDatabase(database);
+    }
+    
+    public void printDatabase(){
+        database.printDatabase();
+    }
+    
+    public Database getDatabase() {
+        return database;
     }
 }

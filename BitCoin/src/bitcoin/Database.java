@@ -13,13 +13,13 @@ import java.util.ArrayList;
  * @author diego
  */
 public class Database implements Serializable{
-    private ArrayList arrayUserInformation;
+    private ArrayList <UserInformation> arrayUserInformation;
     private ArrayList arrayTransactions;
     private int numberOfUsers;
     private int numberOfTransactions;
     
     public Database() {
-        this.arrayUserInformation = new ArrayList();
+        this.arrayUserInformation = new ArrayList<>();
         this.arrayTransactions = new ArrayList();
         numberOfUsers = 0;
         numberOfTransactions = 0;
@@ -44,6 +44,16 @@ public class Database implements Serializable{
         }
         
     }
+    
+    public int getUnicastPort(String username) {
+        for (int i=0; i < arrayUserInformation.size(); i++) {
+            UserInformation temp = (UserInformation) arrayUserInformation.get(i);
+            if (temp.getUsername().equals(username)) {
+                return temp.getUnicastPort();
+            }
+        }
+        return 0;
+    }
 
     public ArrayList getArrayUserInformation() {
         return arrayUserInformation;
@@ -60,6 +70,13 @@ public class Database implements Serializable{
 
     public int getNumberOfTransactions() {
         return numberOfTransactions;
+    }
+
+    public void printDatabase(){
+        System.out.println("Print Database: ");
+        for (int i=0; i<arrayUserInformation.size();i++){
+            System.out.println(arrayUserInformation.get(i).getUsername());
+        }    
     }
 
 }

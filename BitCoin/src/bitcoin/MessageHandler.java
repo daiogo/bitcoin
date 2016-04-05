@@ -5,11 +5,11 @@
  */
 package bitcoin;
 
+import bitcoin.messages.BuyMessage;
 import bitcoin.messages.ExitMessage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,6 +64,9 @@ public class MessageHandler extends Thread {
             case "bitcoin.messages.ExitMessage":
                 handle_exit_message(ExitMessage.class.cast(object));
                 break;
+            case "bitcoin.messages.BuyMessage":
+                handleBuyMessage(BuyMessage.class.cast(object));
+                break;
             default:
                 System.out.println("Message received class not found: " + objectName);
                 break;
@@ -71,16 +74,16 @@ public class MessageHandler extends Thread {
     }
     
     public void handle_hello_message(UserInformation userInformation){
-        System.out.println("Received Hello Message");
         //ignore my own message
         if(!userInformation.getUsername().equals(myPeer.getUsername())){
+            System.out.println("Received Hello Message");
             //add new user to database
             myPeer.databaseAddUserInformation(userInformation);
-            myPeer.sendMessage("database");
+            myPeer.sendUnicastMessage("database", userInformation.getUnicastPort(), "", 0);
         }
     }
     
-    public void handle_database_message(Database database){
+    public synchronized void handle_database_message(Database database){
         System.out.println("Received Database message");
         myPeer.setDatabase(database);
     }
@@ -88,5 +91,13 @@ public class MessageHandler extends Thread {
     public void handle_exit_message(ExitMessage exitMessage){
         System.out.println("Received Exit Message");
         myPeer.databaseRemoveUserInformation(exitMessage.getUserInformation());
+    }
+    
+    public void handleBuyMessage(BuyMessage buyMessage){
+        System.out.println("Received Buy Message");
+        System.out.println("User " + buyMessage.getBuyer() + " wants to buy " + buyMessage.getCoins() + " coins.");
+        
+        // Create transaction message
+        
     }
 }
