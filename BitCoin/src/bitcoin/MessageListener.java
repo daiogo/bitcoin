@@ -43,14 +43,14 @@ public class MessageListener extends Thread {
 
     @Override
     public void run() {
+        handler = new MessageHandler( myPeer);
         while (exit == false) {
             
             try {
                 byte buffer[] = new byte[MAX_UDP_MESSAGE_SIZE];
                 inPacket = new DatagramPacket(buffer, buffer.length);
                 socket.receive(inPacket);
-                handler = new MessageHandler(inPacket.getData(), myPeer);
-                handler.start();
+                handler.init_handler(inPacket.getData());
             } catch (IOException ex) {
                 Logger.getLogger(MessageListener.class.getName()).log(Level.SEVERE, null, ex);
             }
