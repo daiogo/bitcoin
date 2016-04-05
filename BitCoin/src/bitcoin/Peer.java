@@ -25,14 +25,12 @@ public class Peer {
     public static final int MULTICAST_PORT = 6789;
     public static final String GROUP_IP = "228.5.6.7";
     private Wallet wallet;
-    private SignatureVerifier signatureVerifier;
+
     private Database database;
     private UserInformation myUserInformation;
     private MessageSender messageSender;
     private MessageListener receiver;
     private boolean exit;
-    private Scanner scanner;
-    private String command;
     private String username;
     private int unicastPort;
     private String coinPrice;
@@ -51,7 +49,6 @@ public class Peer {
         this.username = username;
         this.unicastPort = unicastPort;
         this.wallet = new Wallet();
-        this.signatureVerifier = new SignatureVerifier();
         this.database = new Database();
         this.myUserInformation = new UserInformation(username, 100,coinPrice, unicastPort ,this.wallet.getPublicKey());
         this.database.addUserInformation(myUserInformation);
@@ -63,10 +60,11 @@ public class Peer {
     }
     
     public void test_signature(){
-        
+        /*
         byte [] signedFile = wallet.signFile("test_file.txt");
         signatureVerifier.verify(myUserInformation.getPublicKey(), signedFile, "test_file.txt");
         signatureVerifier.verify(myUserInformation.getPublicKey(), signedFile, "test_file2.txt");
+    */    
     }
     
     public void init_peer() {
@@ -125,6 +123,14 @@ public class Peer {
             }
         } catch (IOException ex) {
             Logger.getLogger(PeerWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void sendTransactionMessage(BuyMessage buyMessage){
+        try {
+            messageSender.sendTransaction(buyMessage, wallet);
+        } catch (IOException ex) {
+            Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -211,4 +217,5 @@ public class Peer {
     public Database getDatabase() {
         return database;
     }
+    
 }

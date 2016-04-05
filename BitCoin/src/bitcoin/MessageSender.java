@@ -9,6 +9,7 @@ import static bitcoin.Peer.GROUP_IP;
 import static bitcoin.Peer.MULTICAST_PORT;
 import bitcoin.messages.BuyMessage;
 import bitcoin.messages.ExitMessage;
+import bitcoin.messages.TransactionMessage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -82,6 +83,16 @@ public class MessageSender {
         byte[] messageBytes = serialize_object(buyMessage);
         UDPClient udpClient = new UDPClient(unicastPort);
         udpClient.sendDatabase(messageBytes);
+    }
+    
+    public void sendTransaction(BuyMessage buyMessage, Wallet wallet) throws IOException{
+        byte[] serializedBuyMessage = serialize_object(buyMessage);
+        byte[] signedMessage = wallet.signFile(serializedBuyMessage);
+        TransactionMessage transactionMessage = new TransactionMessage(
+            buyMessage,signedMessage);
+        byte[] messageBytes = serialize_object(transactionMessage);
+        outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
+        socket.send(outPacket);
     }
 
 }

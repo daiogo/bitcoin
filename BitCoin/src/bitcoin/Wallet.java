@@ -62,7 +62,7 @@ public class Wallet {
         }
     }
     
-    public byte[] signFile(String nameOfFileToSign) {
+    public byte[] signFile(byte[] buffer) {
 
         byte[] realSig = null;
         try {
@@ -73,7 +73,7 @@ public class Wallet {
             dsa.initSign(privateKey);
 
             /* Update and sign the data */
-
+/*
             FileInputStream fis = new FileInputStream(nameOfFileToSign);
             BufferedInputStream bufin = new BufferedInputStream(fis);
             byte[] buffer = new byte[1024];
@@ -82,8 +82,9 @@ public class Wallet {
                 len = bufin.read(buffer);
                 dsa.update(buffer, 0, len);
             };
-
-            bufin.close();
+*/
+            dsa.update(buffer, 0, buffer.length);
+            //bufin.close();
 
             /* Now that all the data to be signed has been read in, 
                     generate a signature for it */

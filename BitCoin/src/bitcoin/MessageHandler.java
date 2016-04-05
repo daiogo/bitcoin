@@ -7,6 +7,7 @@ package bitcoin;
 
 import bitcoin.messages.BuyMessage;
 import bitcoin.messages.ExitMessage;
+import bitcoin.messages.TransactionMessage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -20,6 +21,7 @@ import java.util.logging.Logger;
 public class MessageHandler extends Thread{ 
     private Peer myPeer;
     private byte[] message;
+    private SignatureVerifier signatureVerifier = new SignatureVerifier();
     
     public MessageHandler(byte[] message, Peer peer) {
         myPeer = peer;
@@ -68,6 +70,9 @@ public class MessageHandler extends Thread{
             case "bitcoin.messages.BuyMessage":
                 handleBuyMessage(BuyMessage.class.cast(object));
                 break;
+            case "bitcoin.messages.TransactionMessage":
+                handleTransactionMessage(TransactionMessage.class.cast(object));
+                break;
             default:
                 System.out.println("Message received class not found: " + objectName);
                 break;
@@ -99,8 +104,20 @@ public class MessageHandler extends Thread{
         System.out.println("User " + buyMessage.getBuyerUsername() + 
                 " wants to buy " + buyMessage.getCoins() + " coins." +
                 "from: "+buyMessage.getSellerUsername());
+        myPeer.sendTransactionMessage(buyMessage);
+        // Create transaction message  
+    }
+    
+
+    public void handleTransactionMessage(TransactionMessage transactionMessage){
+        System.out.println("Received Transaction Message");
+        BuyMessage buyMessage = transactionMessage.getBuyMessage();
+        System.out.println("User " + buyMessage.getBuyerUsername() + 
+                " bought " + buyMessage.getCoins() + " coins." +
+                "from: "+buyMessage.getSellerUsername());
         
-        // Create transaction message
-        
+        byte[] encryptedBuyMessage = transactionMessage.getEncryptedBuyMessage();
+        //signatureVerifier.verify(pubKey, message, datafile);
+        //call Mining method
     }
 }

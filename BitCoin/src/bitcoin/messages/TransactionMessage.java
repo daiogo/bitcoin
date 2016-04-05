@@ -15,4 +15,19 @@ public class TransactionMessage implements Serializable{
     private BuyMessage buyMessage;
     private byte[] encryptedBuyMessage;
     
+    public TransactionMessage(BuyMessage buyMessage, 
+            byte[] encryptedBuyMessage){
+        this.buyMessage = buyMessage;
+        this.encryptedBuyMessage = encryptedBuyMessage;
+    }
+
+    public BuyMessage getBuyMessage() {
+        return buyMessage;
+    }
+
+    public byte[] getEncryptedBuyMessage() {
+        return encryptedBuyMessage;
+    }
+    
+    
 }
