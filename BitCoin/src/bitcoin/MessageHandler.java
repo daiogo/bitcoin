@@ -16,13 +16,13 @@ import java.util.logging.Logger;
  *
  * @author Diogo
  */
-//public class MessageHandler extends Thread{ 
-
-public class MessageHandler {
+public class MessageHandler extends Thread{ 
     private Peer myPeer;
+    private byte[] message;
     
-    public MessageHandler( Peer peer) {
+    public MessageHandler(byte[] message, Peer peer) {
         myPeer = peer;
+        this.message = message;
     }
     
     public static Object deserialize_object(byte[] message) {
@@ -47,7 +47,8 @@ public class MessageHandler {
         return object;
     }
     
-    public void init_handler(byte[] message) {
+    @Override
+    public void run () {
         Object object = deserialize_object(message);
         String objectName = object.getClass().getName();
         //System.out.println("Class name: " + objectName);
