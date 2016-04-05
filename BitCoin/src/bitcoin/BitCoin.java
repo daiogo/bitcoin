@@ -23,12 +23,14 @@ public class BitCoin {
             System.out.println("Please use three arguments: ID PORT CoinPrice");
             System.exit(0);
         }
+        /*
         Random random = new Random();
         try {
             Thread.sleep(random.nextInt(3000)+500);
         } catch (InterruptedException ex) {
             Logger.getLogger(BitCoin.class.getName()).log(Level.SEVERE, null, ex);
         }
+        */
 	Peer peer = new Peer(args[0], Integer.parseInt(args[1]), args[2]);
 	//peer.test_signature();
         peer.init_peer();

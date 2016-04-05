@@ -17,7 +17,7 @@ public class PeerWindow extends javax.swing.JFrame {
     /**
      * Creates new form PeerWindow
      */
-    private DefaultTableModel tableModel;
+    //private DefaultTableModel tableModel;
     private Peer myPeer;
     
     public PeerWindow(UserInformation myUserInformation, Peer peer) {
@@ -25,10 +25,24 @@ public class PeerWindow extends javax.swing.JFrame {
         initComponents();
         label_welcome.setText("Welcome "+myUserInformation.getUsername());
         this.setTitle("BitCoin Peer");
-        createTable();
         
     }
     
+    public synchronized void updateDatabase(Database database){
+        ArrayList arrayUserInformation = database.getArrayUserInformation();
+        UserInformation userInformation;
+        usersList.removeAll();
+        usersList.add("Username, Coins, CoinPrice");
+        for(int i = 0; i<arrayUserInformation.size(); i++){
+            userInformation = UserInformation.class.cast(arrayUserInformation.get(i));
+            String s = ""+
+                userInformation.getUsername() + ", " +
+                userInformation.getCoins() + ", " +
+                userInformation.getCoinPrice();
+            usersList.add(s);
+        }
+    }
+    /*
     public synchronized void updateDatabase(Database database){
         ArrayList arrayUserInformation = database.getArrayUserInformation();
         UserInformation userInformation;
@@ -42,7 +56,8 @@ public class PeerWindow extends javax.swing.JFrame {
             });
         }
     }
-    
+    */
+    /*
     private synchronized void createTable(){
         DefaultTableModel tempTableModel = (new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -79,6 +94,7 @@ public class PeerWindow extends javax.swing.JFrame {
         tableModel = tempTableModel;
         table_database.setModel(tableModel);
     }
+    */
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -96,8 +112,6 @@ public class PeerWindow extends javax.swing.JFrame {
         jScrollPane7 = new javax.swing.JScrollPane();
         jList3 = new javax.swing.JList<>();
         label_welcome = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        table_database = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
         text_area_messages_received = new javax.swing.JTextArea();
         label_message_received = new javax.swing.JLabel();
@@ -113,6 +127,7 @@ public class PeerWindow extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jTextField2 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        usersList = new java.awt.List();
 
         jList1.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -139,37 +154,6 @@ public class PeerWindow extends javax.swing.JFrame {
 
         label_welcome.setFont(new java.awt.Font("Noto Sans", 0, 18)); // NOI18N
         label_welcome.setText("Welcome $username");
-
-        table_database.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "User", "Coins", "Price"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Integer.class, java.lang.String.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        table_database.getTableHeader().setReorderingAllowed(false);
-        jScrollPane1.setViewportView(table_database);
-        if (table_database.getColumnModel().getColumnCount() > 0) {
-            table_database.getColumnModel().getColumn(0).setResizable(false);
-            table_database.getColumnModel().getColumn(1).setResizable(false);
-            table_database.getColumnModel().getColumn(2).setResizable(false);
-        }
 
         text_area_messages_received.setEditable(false);
         text_area_messages_received.setColumns(20);
@@ -251,36 +235,32 @@ public class PeerWindow extends javax.swing.JFrame {
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(100, 100, 100))
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(label_welcome)
-                            .addComponent(label_message_received)
-                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(label_message_sent)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-            .addGroup(layout.createSequentialGroup()
                 .addGap(150, 150, 150)
                 .addComponent(button_exit, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(usersList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(label_welcome)
+                            .addComponent(label_message_received)
+                            .addComponent(label_message_sent))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(label_welcome)
-                .addGap(16, 16, 16)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(usersList, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -357,7 +337,6 @@ public class PeerWindow extends javax.swing.JFrame {
     private javax.swing.JList<String> jList2;
     private javax.swing.JList<String> jList3;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane5;
@@ -369,8 +348,8 @@ public class PeerWindow extends javax.swing.JFrame {
     private javax.swing.JLabel label_message_received;
     private javax.swing.JLabel label_message_sent;
     private javax.swing.JLabel label_welcome;
-    private javax.swing.JTable table_database;
     private javax.swing.JTextArea text_area_messages_received;
     private javax.swing.JTextArea text_area_messages_sent;
+    private java.awt.List usersList;
     // End of variables declaration//GEN-END:variables
 }

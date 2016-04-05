@@ -6,7 +6,6 @@ import java.io.*;
 public class UDPServer extends Thread{
     
     public static final int MAX_UDP_MESSAGE_SIZE = 65535;
-    private MessageHandler handler;
     private Peer myPeer;
     private int unicastPort;
     
@@ -17,6 +16,7 @@ public class UDPServer extends Thread{
     
     public void run(){ 
         DatagramSocket aSocket = null;
+
         System.out.println("UDP Server Started on port " + unicastPort);
         try{
             aSocket = new DatagramSocket(unicastPort);
@@ -27,9 +27,9 @@ public class UDPServer extends Thread{
                 aSocket.receive(request);     
                 DatagramPacket inPacket = new DatagramPacket(request.getData(), request.getLength(), 
                     request.getAddress(), request.getPort());
-                System.out.println("Unicast Message Received");
-                handler = new MessageHandler(inPacket.getData(), myPeer);
-                handler.start();
+                //System.out.println("Unicast Message Received");
+                MessageHandler handler = new MessageHandler(inPacket.getData(),myPeer);
+                handler.run();
             }
         }catch (SocketException e){System.out.println("Socket: " + e.getMessage());
         }catch (IOException e) {System.out.println("IO: " + e.getMessage());
