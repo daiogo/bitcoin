@@ -1,5 +1,6 @@
 package bitcoin;
 
+import bitcoin.messages.BuyMessage;
 import java.io.*;
 import java.security.*;
 import java.security.spec.*;
@@ -9,11 +10,11 @@ import java.security.spec.*;
  */
 public class SignatureVerifier {
     
-    public void verify(PublicKey pubKey, byte[] signedFile, String datafile ){
+    public void verify(PublicKey pubKey, byte[] signedMessage, byte[] originalMessage){
         /* Verify a DSA signature */
 
-        if(signedFile == null){
-            System.out.println("SignatureVerifier: Signed file is null");
+        if(signedMessage == null){
+            System.out.println("ERROR | SignatureVerifier | Signed message is null");
             return;
         }
         try{
@@ -32,7 +33,7 @@ public class SignatureVerifier {
             sig.initVerify(pubKey);
 
             /* Update and verify the data */
-
+/*
             FileInputStream datafis = new FileInputStream(datafile);
             BufferedInputStream bufin = new BufferedInputStream(datafis);
 
@@ -44,9 +45,13 @@ public class SignatureVerifier {
                 };
 
             bufin.close();
+  */          
+            
+            sig.update(originalMessage, 0, originalMessage.length);
+            
 
 
-            boolean verifies = sig.verify(signedFile);
+            boolean verifies = sig.verify(signedMessage);
 
             System.out.println("signature verifies: " + verifies);
 

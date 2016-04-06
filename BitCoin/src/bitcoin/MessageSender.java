@@ -89,7 +89,7 @@ public class MessageSender {
         byte[] serializedBuyMessage = serialize_object(buyMessage);
         byte[] signedMessage = wallet.signFile(serializedBuyMessage);
         TransactionMessage transactionMessage = new TransactionMessage(
-            buyMessage,signedMessage);
+            serializedBuyMessage, signedMessage);
         byte[] messageBytes = serialize_object(transactionMessage);
         outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
         socket.send(outPacket);

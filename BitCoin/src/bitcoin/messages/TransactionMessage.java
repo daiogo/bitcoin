@@ -12,22 +12,19 @@ import java.io.Serializable;
  * @author Diogo
  */
 public class TransactionMessage implements Serializable{
-    private BuyMessage buyMessage;
+    private byte[] serializedBuyMessage;
     private byte[] encryptedBuyMessage;
     
-    public TransactionMessage(BuyMessage buyMessage, 
-            byte[] encryptedBuyMessage){
-        this.buyMessage = buyMessage;
+    public TransactionMessage(byte[] serializedBuyMessage, byte[] encryptedBuyMessage){
+        this.serializedBuyMessage = serializedBuyMessage;
         this.encryptedBuyMessage = encryptedBuyMessage;
     }
-
-    public BuyMessage getBuyMessage() {
-        return buyMessage;
-    }
-
+    
     public byte[] getEncryptedBuyMessage() {
         return encryptedBuyMessage;
     }
     
-    
+    public byte[] getSerializedBuyMessage() {
+        return serializedBuyMessage;
+    }
 }

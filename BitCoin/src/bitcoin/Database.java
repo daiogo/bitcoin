@@ -6,6 +6,7 @@
 package bitcoin;
 
 import java.io.Serializable;
+import java.security.PublicKey;
 import java.util.ArrayList;
 
 /**
@@ -43,6 +44,17 @@ public class Database implements Serializable{
             }
         }
         
+    }
+    
+    public PublicKey getPublicKey(String username) {
+        for (int i=0; i < arrayUserInformation.size(); i++) {
+            UserInformation temp = (UserInformation) arrayUserInformation.get(i);
+            if (temp.getUsername().equals(username)) {
+                return temp.getPublicKey();
+            }
+        }
+        PublicKey publicKey = null;
+        return publicKey;
     }
     
     public int getUnicastPort(String username) {
