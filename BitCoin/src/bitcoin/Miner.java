@@ -5,7 +5,8 @@
  */
 package bitcoin;
 
-import static bitcoin.MessageHandler.deserialize_object;
+import bitcoin.peerClient.MessageSender;
+import static bitcoin.peerServer.MessageHandler.deserialize_object;
 import bitcoin.messages.BuyMessage;
 import bitcoin.messages.TransactionMessage;
 import java.io.IOException;

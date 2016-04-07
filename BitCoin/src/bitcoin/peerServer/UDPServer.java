@@ -1,5 +1,6 @@
-package bitcoin;
+package bitcoin.peerServer;
 
+import bitcoin.Peer;
 import java.net.*;
 import java.io.*;
 

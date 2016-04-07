@@ -5,6 +5,8 @@
  */
 package bitcoin;
 
+import bitcoin.peerClient.MessageSender;
+import bitcoin.peerServer.MessageListener;
 import bitcoin.messages.BuyMessage;
 import java.net.*;
 import java.io.*;

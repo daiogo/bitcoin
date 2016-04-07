@@ -3,13 +3,24 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package bitcoin;
+package bitcoin.peerClient;
 
+//bitcoin package
 import static bitcoin.Peer.GROUP_IP;
 import static bitcoin.Peer.MULTICAST_PORT;
+import bitcoin.Database;
+import bitcoin.UserInformation;
+import bitcoin.Wallet;
+
+//peerClient package
+import bitcoin.peerClient.UDPClient;
+
+//messages package
 import bitcoin.messages.BuyMessage;
 import bitcoin.messages.ExitMessage;
 import bitcoin.messages.TransactionMessage;
+
+//java
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
