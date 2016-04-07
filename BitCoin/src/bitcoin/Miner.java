@@ -57,16 +57,16 @@ public class Miner extends Thread {
     public void run() {
         byte[] encryptedBuyMessage = transactionMessage.getEncryptedBuyMessage();
         byte[] serializedBuyMessage = transactionMessage.getSerializedBuyMessage();
-        BuyMessage buyMessage = (BuyMessage) deserialize_object(transactionMessage.getSerializedBuyMessage());
-        String buyerUsername = buyMessage.getBuyerUsername();
-        String sellerUsername = buyMessage.getSellerUsername();
-        int ammount = buyMessage.getCoins();
         
+        BuyMessage buyMessage = (BuyMessage) deserialize_object(serializedBuyMessage);
+        String buyerUsername = buyMessage.getBuyerUsername();
+        String sellerUsername = buyMessage.getSellerUsername();       
+        //If I'm the buyer or seller, don't try to mine
         if (myPeer.getUsername().equals(sellerUsername) || myPeer.getUsername().equals(buyerUsername)) {
             return;
         }
 
-        // Sleeps thread from 0 to 9 seconds randomly
+        // Sleeps thread from 3 to 10 seconds randomly to simulate mine processing time
         try {
             Thread.sleep(randomGenerator.nextInt(7000) + 3000);
         } catch (InterruptedException ex) {
@@ -75,41 +75,49 @@ public class Miner extends Thread {
         
         // Verifies signature
         boolean signatureMatches = verifySignature(myPeer.getDatabase().getPublicKey(sellerUsername), encryptedBuyMessage, serializedBuyMessage);
+        if (!signatureMatches) {
+            System.out.println("Signature doesn't match, transaction cancelled");
+            return;
+        }
         
-        if (signatureMatches) {
-            System.out.println("Signature verified!");
-            
-            // Update database coins
-            Database database = myPeer.getDatabase();
-            
-            for (int i = 0; i < database.getNumberOfUsers(); i++) {
-                UserInformation temp = (UserInformation) database.getArrayUserInformation().get(i);
-                
-                if (temp.getUsername().equals(sellerUsername)) {
+        System.out.println("Signature verified!");
+        int ammount = buyMessage.getCoins();
+        // Update database coins
+        Database database = myPeer.getDatabase();
+
+        // find seller and see if it has enough coins
+        for (int i = 0; i < database.getNumberOfUsers(); i++) {
+            UserInformation temp = (UserInformation) database.getArrayUserInformation().get(i);
+
+            if (temp.getUsername().equals(sellerUsername)) {
+                if(temp.getCoins() - ammount - REWARD_VALUE < 0){
+                    System.out.println("Seller doesn't have enough coins, transaction cancelled");
+                    return;
+                } else {
                     temp.setCoins(temp.getCoins() - ammount - REWARD_VALUE);
                 }
-                
-                if (temp.getUsername().equals(buyerUsername)) {
-                    temp.setCoins(temp.getCoins() + ammount);
-                }
-                
-                if (temp.getUsername().equals(myPeer.getUsername())) {
-                    temp.setCoins(temp.getCoins() + REWARD_VALUE);
-                }
             }
-            
-            try {
-                // Send database to users
-                MessageSender sender = new MessageSender(myPeer.getMulticastSocket());
-                sender.updateDatabase(database);
-            } catch (UnknownHostException ex) {
-                Logger.getLogger(Miner.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(Miner.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        //find buyer and miner (myself) to increase amount of coins
+        for (int i = 0; i < database.getNumberOfUsers(); i++) {
+            UserInformation temp = (UserInformation) database.getArrayUserInformation().get(i);       
+            if (temp.getUsername().equals(buyerUsername)) {
+                temp.setCoins(temp.getCoins() + ammount);
             }
-            
-        } else {
-            System.out.println("ERROR | Signature doesn't match");
+            if (temp.getUsername().equals(myPeer.getUsername())) {
+                temp.setCoins(temp.getCoins() + REWARD_VALUE);
+            }
+        }
+
+        try {
+            // Send success message
+            MessageSender sender = new MessageSender(myPeer.getMulticastSocket());
+            sender.updateDatabase(database);
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(Miner.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Miner.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

@@ -114,11 +114,12 @@ public class MessageHandler extends Thread{
         // Create transaction message  
     }
     
-
     public void handleTransactionMessage(TransactionMessage transactionMessage){
         System.out.println("Received Transaction Message");
         //call Mining method
         Miner miner = new Miner(transactionMessage, myPeer);
         miner.start();
     }
+    
+    
 }
