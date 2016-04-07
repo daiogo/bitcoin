@@ -111,15 +111,8 @@ public class MessageHandler extends Thread{
 
     public void handleTransactionMessage(TransactionMessage transactionMessage){
         System.out.println("Received Transaction Message");
-        byte[] encryptedBuyMessage = transactionMessage.getEncryptedBuyMessage();
-        byte[] serializedBuyMessage = transactionMessage.getSerializedBuyMessage();
-        BuyMessage buyMessage = (BuyMessage) deserialize_object(transactionMessage.getSerializedBuyMessage());
-        System.out.println("User " + buyMessage.getBuyerUsername() + 
-                " bought " + buyMessage.getCoins() + " coins." +
-                "from "+ buyMessage.getSellerUsername());
-        
-        
-        signatureVerifier.verify(myPeer.getDatabase().getPublicKey(buyMessage.getSellerUsername()), encryptedBuyMessage, serializedBuyMessage);
         //call Mining method
+        Miner miner = new Miner(transactionMessage, myPeer);
+        miner.start();
     }
 }

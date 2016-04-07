@@ -5,6 +5,7 @@
  */
 package bitcoin;
 
+import bitcoin.messages.TransactionMessage;
 import java.io.Serializable;
 import java.security.PublicKey;
 import java.util.ArrayList;
@@ -15,13 +16,13 @@ import java.util.ArrayList;
  */
 public class Database implements Serializable{
     private ArrayList <UserInformation> arrayUserInformation;
-    private ArrayList arrayTransactions;
+    private ArrayList <TransactionMessage> arrayTransactions;
     private int numberOfUsers;
     private int numberOfTransactions;
     
     public Database() {
         this.arrayUserInformation = new ArrayList<>();
-        this.arrayTransactions = new ArrayList();
+        this.arrayTransactions = new ArrayList<>();
         numberOfUsers = 0;
         numberOfTransactions = 0;
     }

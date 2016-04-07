@@ -57,20 +57,20 @@ public class MessageSender {
         return serialized_object;
     }   
     
-    public void sendHello(UserInformation userInformation)throws IOException {        
+    public void sendHello(UserInformation userInformation) throws IOException {        
         byte[] messageBytes = serialize_object(userInformation);
         
         outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
         socket.send(outPacket);
     }
     
-    public void sendDatabase(Database database, int unicastPort)throws IOException {        
+    public void sendDatabase(Database database, int unicastPort) throws IOException {        
         byte[] messageBytes = serialize_object(database);
         UDPClient udpClient = new UDPClient(unicastPort);
         udpClient.sendDatabase(messageBytes);
     }
     
-    public void sendExit(UserInformation userInformation)throws IOException {   
+    public void sendExit(UserInformation userInformation) throws IOException {   
         ExitMessage exitMessage = new ExitMessage(userInformation);
         byte[] messageBytes = serialize_object(exitMessage);
         
@@ -95,4 +95,11 @@ public class MessageSender {
         socket.send(outPacket);
     }
 
+    public void updateDatabase(Database database) throws IOException {        
+        byte[] messageBytes = serialize_object(database);
+        
+        outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
+        socket.send(outPacket);
+    }
+    
 }

@@ -8,11 +8,6 @@ package bitcoin;
 import bitcoin.messages.BuyMessage;
 import java.net.*;
 import java.io.*;
-import java.security.*;
-
-import javax.crypto.*;
-import java.util.Arrays;
-import java.util.Scanner;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -92,6 +87,10 @@ public class Peer {
         }
         debugThread = new DebugThread(this);
         debugThread.start();
+    }
+
+    public MulticastSocket getMulticastSocket() {
+        return multicastSocket;
     }
 
     public void sendMulticastMessage(String command) {
