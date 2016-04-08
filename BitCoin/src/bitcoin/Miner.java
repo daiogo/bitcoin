@@ -5,7 +5,8 @@
  */
 package bitcoin;
 
-import static bitcoin.MessageHandler.deserialize_object;
+import bitcoin.peerClient.MessageSender;
+import static bitcoin.peerServer.MessageHandler.deserialize_object;
 import bitcoin.messages.BuyMessage;
 import bitcoin.messages.MiningMessage;
 import bitcoin.messages.TransactionMessage;
@@ -58,17 +59,19 @@ public class Miner extends Thread {
     public void run() {
         byte[] encryptedBuyMessage = transactionMessage.getEncryptedBuyMessage();
         byte[] serializedBuyMessage = transactionMessage.getSerializedBuyMessage();
-        BuyMessage buyMessage = (BuyMessage) deserialize_object(transactionMessage.getSerializedBuyMessage());
+        
+        // Neither seller nor buyer are permitted to mine the trasaction
+        BuyMessage buyMessage = (BuyMessage) deserialize_object(serializedBuyMessage);
         String buyerUsername = buyMessage.getBuyerUsername();
         String sellerUsername = buyMessage.getSellerUsername();
         int ammount = buyMessage.getCoins();
         
-        // Neither seller nor buyer are permitted to mine the trasaction
+        // If I'm the buyer or seller, don't try to mine
         if (myPeer.getUsername().equals(sellerUsername) || myPeer.getUsername().equals(buyerUsername)) {
             return;
         }
 
-        // Sleeps thread from 3 to 10 seconds randomly
+        // Sleeps thread from 3 to 10 seconds randomly to simulate mine processing time
         try {
             Thread.sleep(randomGenerator.nextInt(7000) + 3000);
         } catch (InterruptedException ex) {
@@ -77,6 +80,10 @@ public class Miner extends Thread {
         
         // Verifies signature
         boolean signatureMatches = verifySignature(myPeer.getDatabase().getPublicKey(sellerUsername), encryptedBuyMessage, serializedBuyMessage);
+        if (!signatureMatches) {
+            System.out.println("Signature doesn't match, transaction cancelled");
+            return;
+        }
         
         if (signatureMatches) {
             System.out.println("Signature verified!");

@@ -3,8 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package bitcoin;
+package bitcoin.peerServer;
 
+import bitcoin.Database;
+import bitcoin.peerClient.MessageSender;
+import bitcoin.Miner;
+import bitcoin.Peer;
+import bitcoin.SignatureVerifier;
+import bitcoin.UserInformation;
 import bitcoin.messages.BuyMessage;
 import bitcoin.messages.ExitMessage;
 import bitcoin.messages.MiningMessage;
@@ -113,14 +119,14 @@ public class MessageHandler extends Thread {
         // Ask to send transaction message  
         myPeer.sendTransactionMessage(buyMessage);
     }
-    
+
     public void handleTransactionMessage(TransactionMessage transactionMessage) {
         System.out.println("Received Transaction Message");
         //call Mining method
         Miner miner = new Miner(transactionMessage, myPeer);
         miner.start();
     }
-    
+
     public void handleMiningMessage(MiningMessage miningMessage) {
         System.out.println("Received Mining Message");
         Database database = myPeer.getDatabase();

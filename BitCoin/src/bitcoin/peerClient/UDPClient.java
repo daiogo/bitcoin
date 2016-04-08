@@ -1,4 +1,4 @@
-package bitcoin;
+package bitcoin.peerClient;
 
 import java.net.*;
 import java.io.*;
