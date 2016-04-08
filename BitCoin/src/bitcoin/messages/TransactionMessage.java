@@ -11,13 +11,19 @@ import java.io.Serializable;
  *
  * @author Diogo
  */
-public class TransactionMessage implements Serializable{
+public class TransactionMessage implements Serializable {
+    private String id;
     private byte[] serializedBuyMessage;
     private byte[] encryptedBuyMessage;
     
-    public TransactionMessage(byte[] serializedBuyMessage, byte[] encryptedBuyMessage){
+    public TransactionMessage(String id, byte[] serializedBuyMessage, byte[] encryptedBuyMessage) {
+        this.id = id;
         this.serializedBuyMessage = serializedBuyMessage;
         this.encryptedBuyMessage = encryptedBuyMessage;
+    }
+
+    public String getId() {
+        return id;
     }
     
     public byte[] getEncryptedBuyMessage() {

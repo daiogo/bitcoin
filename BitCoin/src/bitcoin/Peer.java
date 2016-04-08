@@ -108,14 +108,6 @@ public class Peer {
                 case "help":
                     System.out.println("Commands Help:");
                     break;
-                case "transaction":
-                    //if (database.getNumberOfUsers() >= MIN_USERS) {
-//-->                        //messageSender.sendTransaction();
-                    //} else {
-                    //    System.out.println("ERROR | You may only perform a transaction when at least 4 users are in the network.");
-                    //    System.out.println("      | There are currently " + database.getNumberOfUsers() + " users.");
-                    //}
-                    break;
                 default:
                     System.out.println("ERROR | Command not found");
                     break;
@@ -140,8 +132,13 @@ public class Peer {
                     messageSender.sendDatabase(database, unicastPort);
                     break;
                 case "buy":
-                    BuyMessage buyMessage = new BuyMessage(coins, username ,seller);
-                    messageSender.sendBuy(buyMessage, unicastPort);
+                    //if (database.getNumberOfUsers() >= MIN_USERS) {
+                        BuyMessage buyMessage = new BuyMessage(coins, username, seller);
+                        messageSender.sendBuy(buyMessage, unicastPort);
+                    //} else {
+                    //    System.out.println("ERROR | You may only perform a transaction when at least 4 users are in the network.");
+                    //    System.out.println("      | There are currently " + database.getNumberOfUsers() + " users.");
+                    //}
                     break;
                 default:
                     

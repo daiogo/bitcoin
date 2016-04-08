@@ -5,6 +5,7 @@
  */
 package bitcoin;
 
+import bitcoin.messages.MiningMessage;
 import bitcoin.messages.TransactionMessage;
 import java.io.Serializable;
 import java.security.PublicKey;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
  */
 public class Database implements Serializable{
     private ArrayList <UserInformation> arrayUserInformation;
-    private ArrayList <TransactionMessage> arrayTransactions;
+    private ArrayList <MiningMessage> arrayTransactions;
     private int numberOfUsers;
     private int numberOfTransactions;
     
@@ -82,12 +83,13 @@ public class Database implements Serializable{
     }
 
     public int getNumberOfTransactions() {
+        numberOfTransactions = arrayTransactions.size();
         return numberOfTransactions;
     }
 
-    public void printDatabase(){
+    public void printDatabase() {
         System.out.println("Print Database: ");
-        for (int i=0; i<arrayUserInformation.size();i++){
+        for (int i=0; i < arrayUserInformation.size(); i++){
             System.out.println(arrayUserInformation.get(i).getUsername());
         }    
     }

@@ -9,6 +9,7 @@ import static bitcoin.Peer.GROUP_IP;
 import static bitcoin.Peer.MULTICAST_PORT;
 import bitcoin.messages.BuyMessage;
 import bitcoin.messages.ExitMessage;
+import bitcoin.messages.MiningMessage;
 import bitcoin.messages.TransactionMessage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,6 +19,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
 import java.security.PublicKey;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -85,11 +87,11 @@ public class MessageSender {
         udpClient.sendDatabase(messageBytes);
     }
     
-    public void sendTransaction(BuyMessage buyMessage, Wallet wallet) throws IOException{
+    public void sendTransaction(BuyMessage buyMessage, Wallet wallet) throws IOException {
         byte[] serializedBuyMessage = serialize_object(buyMessage);
         byte[] signedMessage = wallet.signFile(serializedBuyMessage);
-        TransactionMessage transactionMessage = new TransactionMessage(
-            serializedBuyMessage, signedMessage);
+        String uniqueId = UUID.randomUUID().toString();
+        TransactionMessage transactionMessage = new TransactionMessage(uniqueId, serializedBuyMessage, signedMessage);
         byte[] messageBytes = serialize_object(transactionMessage);
         outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
         socket.send(outPacket);
@@ -97,6 +99,13 @@ public class MessageSender {
 
     public void updateDatabase(Database database) throws IOException {        
         byte[] messageBytes = serialize_object(database);
+        
+        outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
+        socket.send(outPacket);
+    }
+    
+    public void sendMining(MiningMessage miningMessage) throws IOException {        
+        byte[] messageBytes = serialize_object(miningMessage);
         
         outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
         socket.send(outPacket);

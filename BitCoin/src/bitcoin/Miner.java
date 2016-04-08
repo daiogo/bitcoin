@@ -7,12 +7,14 @@ package bitcoin;
 
 import static bitcoin.MessageHandler.deserialize_object;
 import bitcoin.messages.BuyMessage;
+import bitcoin.messages.MiningMessage;
 import bitcoin.messages.TransactionMessage;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.util.Random;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -61,11 +63,12 @@ public class Miner extends Thread {
         String sellerUsername = buyMessage.getSellerUsername();
         int ammount = buyMessage.getCoins();
         
+        // Neither seller nor buyer are permitted to mine the trasaction
         if (myPeer.getUsername().equals(sellerUsername) || myPeer.getUsername().equals(buyerUsername)) {
             return;
         }
 
-        // Sleeps thread from 0 to 9 seconds randomly
+        // Sleeps thread from 3 to 10 seconds randomly
         try {
             Thread.sleep(randomGenerator.nextInt(7000) + 3000);
         } catch (InterruptedException ex) {
@@ -84,28 +87,23 @@ public class Miner extends Thread {
             for (int i = 0; i < database.getNumberOfUsers(); i++) {
                 UserInformation temp = (UserInformation) database.getArrayUserInformation().get(i);
                 
-                if (temp.getUsername().equals(sellerUsername)) {
-                    temp.setCoins(temp.getCoins() - ammount - REWARD_VALUE);
-                }
-                
-                if (temp.getUsername().equals(buyerUsername)) {
-                    temp.setCoins(temp.getCoins() + ammount);
-                }
-                
-                if (temp.getUsername().equals(myPeer.getUsername())) {
-                    temp.setCoins(temp.getCoins() + REWARD_VALUE);
+                if (temp.getUsername().equals(sellerUsername) && temp.getCoins() < ammount + REWARD_VALUE) {
+                    System.out.println("ERROR | This transaction is not valid");
+                    return;
                 }
             }
             
+            // Send mining details to all users
             try {
-                // Send database to users
+                MiningMessage miningMessage = new MiningMessage(transactionMessage.getId(), ammount, sellerUsername, buyerUsername, myPeer.getUsername(), System.currentTimeMillis());
                 MessageSender sender = new MessageSender(myPeer.getMulticastSocket());
-                sender.updateDatabase(database);
+                sender.sendMining(miningMessage);
+                System.out.println("Just sent mining message with the id " + transactionMessage.getId());
             } catch (UnknownHostException ex) {
                 Logger.getLogger(Miner.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(Miner.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            }            
             
         } else {
             System.out.println("ERROR | Signature doesn't match");
