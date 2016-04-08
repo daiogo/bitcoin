@@ -1,4 +1,4 @@
-package bitcoin;
+package bitcoin.peerClient;
 
 import bitcoin.messages.BuyMessage;
 import java.io.*;

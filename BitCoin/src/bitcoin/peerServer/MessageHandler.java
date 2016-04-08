@@ -9,7 +9,7 @@ import bitcoin.Database;
 import bitcoin.peerClient.MessageSender;
 import bitcoin.Miner;
 import bitcoin.Peer;
-import bitcoin.SignatureVerifier;
+import bitcoin.peerClient.SignatureVerifier;
 import bitcoin.UserInformation;
 import bitcoin.messages.BuyMessage;
 import bitcoin.messages.ExitMessage;

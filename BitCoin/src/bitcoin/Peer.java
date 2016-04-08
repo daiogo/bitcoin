@@ -39,10 +39,6 @@ public class Peer {
     
     public Peer(String username, int unicastPort, String coinPrice) {
         System.out.println("Peer Constructor");
-//        this.keyHolder = new KeyHolder();
-//        this.verifier = new SignatureVerifier();
-//        this.wallets = new ArrayList();
-//        this.myWallet = new Wallet(username, 100, this.keyHolder.getNotEncodedPublicKey());
         this.username = username;
         this.unicastPort = unicastPort;
         this.wallet = new Wallet();
