@@ -87,8 +87,8 @@ public class Peer {
         } catch (IOException ex) {
             Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
         }
-        debugThread = new DebugThread(this);
-        debugThread.start();
+        //debugThread = new DebugThread(this);
+        //debugThread.start();
     }
 
     public MulticastSocket getMulticastSocket() {
