@@ -78,42 +78,43 @@ public class Miner extends Thread {
             Logger.getLogger(Miner.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        // Verifies signature
-        boolean signatureMatches = verifySignature(myPeer.getDatabase().getPublicKey(sellerUsername), encryptedBuyMessage, serializedBuyMessage);
-        if (!signatureMatches) {
-            System.out.println("Signature doesn't match, transaction cancelled");
+        //Buyer can't be the same as seller
+        if (buyerUsername.equals(sellerUsername)){
+            System.out.println("ERROR | Seller can't be the same as Buyer, transaction cancelled");
             return;
         }
         
-        if (signatureMatches) {
-            System.out.println("Signature verified!");
-            
-            // Update database coins
-            Database database = myPeer.getDatabase();
-            
-            for (int i = 0; i < database.getNumberOfUsers(); i++) {
-                UserInformation temp = (UserInformation) database.getArrayUserInformation().get(i);
-                
-                if (temp.getUsername().equals(sellerUsername) && temp.getCoins() < ammount + REWARD_VALUE) {
-                    System.out.println("ERROR | This transaction is not valid");
-                    return;
-                }
-            }
-            
-            // Send mining details to all users
-            try {
-                MiningMessage miningMessage = new MiningMessage(transactionMessage.getId(), ammount, sellerUsername, buyerUsername, myPeer.getUsername(), System.currentTimeMillis());
-                MessageSender sender = new MessageSender(myPeer.getMulticastSocket());
-                sender.sendMining(miningMessage);
-                System.out.println("Just sent mining message with the id " + transactionMessage.getId());
-            } catch (UnknownHostException ex) {
-                Logger.getLogger(Miner.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(Miner.class.getName()).log(Level.SEVERE, null, ex);
-            }            
-            
-        } else {
-            System.out.println("ERROR | Signature doesn't match");
+        // Verifies signature
+        boolean signatureMatches = verifySignature(myPeer.getDatabase().getPublicKey(sellerUsername), encryptedBuyMessage, serializedBuyMessage);
+        if (!signatureMatches) {
+            System.out.println("ERROR | Signature doesn't match, transaction cancelled");
+            return;
         }
+
+        System.out.println("ERROR | Signature verified!");
+        // Update database coins
+        Database database = myPeer.getDatabase();
+
+        for (int i = 0; i < database.getNumberOfUsers(); i++) {
+            UserInformation temp = (UserInformation) database.getArrayUserInformation().get(i);
+
+            if (temp.getUsername().equals(sellerUsername) && temp.getCoins() < ammount + REWARD_VALUE) {
+                System.out.println("ERROR | Seller does not have enough coins, transaction cancelled");
+                return;
+            }
+        }
+
+        // Send mining details to all users
+        try {
+            MiningMessage miningMessage = new MiningMessage(transactionMessage.getId(), ammount, sellerUsername, buyerUsername, myPeer.getUsername(), System.currentTimeMillis());
+            MessageSender sender = new MessageSender(myPeer.getMulticastSocket());
+            sender.sendMining(miningMessage);
+            System.out.println("Just sent mining message with the id " + transactionMessage.getId());
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(Miner.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Miner.class.getName()).log(Level.SEVERE, null, ex);
+        }            
+
     }
 }

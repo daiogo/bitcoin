@@ -137,7 +137,7 @@ public class MessageHandler extends Thread {
                 //System.out.println("Current timestamp is: " + temp.getTimestamp());
                 //System.out.println("Next timestamp will be: " + miningMessage.getTimestamp());
                 //database.getArrayTransactions().set(i, miningMessage);
-                System.out.println("ERROR | Sorry, another peer mined it quickly");
+                System.out.println("ERROR | Sorry, another peer mined it faster");
                 return;
             }
         }
