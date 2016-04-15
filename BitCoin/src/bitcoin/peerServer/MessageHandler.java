@@ -69,21 +69,27 @@ public class MessageHandler extends Thread {
             case "bitcoin.UserInformation":
                 //Hello message
                 handle_hello_message(UserInformation.class.cast(object));
+                myPeer.windowAddMessageReceived("Hello");
                 break;
             case "bitcoin.Database":
                 handle_database_message(Database.class.cast(object));
+                myPeer.windowAddMessageReceived("Database");
                 break;
             case "bitcoin.messages.ExitMessage":
                 handle_exit_message(ExitMessage.class.cast(object));
+                myPeer.windowAddMessageReceived("Exit");
                 break;
             case "bitcoin.messages.BuyMessage":
                 handleBuyMessage(BuyMessage.class.cast(object));
+                myPeer.windowAddMessageReceived("Buy");
                 break;
             case "bitcoin.messages.TransactionMessage":
                 handleTransactionMessage(TransactionMessage.class.cast(object));
+                myPeer.windowAddMessageReceived("Transaction");
                 break;
             case "bitcoin.messages.MiningMessage":
                 handleMiningMessage(MiningMessage.class.cast(object));
+                myPeer.windowAddMessageReceived("Mining");
                 break;
             default:
                 System.out.println("Message received class not found: " + objectName);
