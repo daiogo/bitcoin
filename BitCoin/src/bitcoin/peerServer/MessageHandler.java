@@ -9,7 +9,6 @@ import bitcoin.Database;
 import bitcoin.peerClient.MessageSender;
 import bitcoin.Miner;
 import bitcoin.Peer;
-import bitcoin.SignatureVerifier;
 import bitcoin.UserInformation;
 import bitcoin.messages.BuyMessage;
 import bitcoin.messages.ExitMessage;
@@ -30,7 +29,6 @@ public class MessageHandler extends Thread {
     private static final int REWARD_VALUE = 1;
     private Peer myPeer;
     private byte[] message;
-    private SignatureVerifier signatureVerifier = new SignatureVerifier();
     
     public MessageHandler(byte[] message, Peer peer) {
         myPeer = peer;
@@ -38,12 +36,12 @@ public class MessageHandler extends Thread {
     }
     
     public static Object deserialize_object(byte[] message) {
-        ObjectInputStream objIn = null;
+        ObjectInputStream objectIn = null;
         Object object = null;
         try {
             ByteArrayInputStream byteIn = new ByteArrayInputStream(message);
-            objIn = new ObjectInputStream(byteIn);
-            object = objIn.readObject();
+            objectIn = new ObjectInputStream(byteIn);
+            object = objectIn.readObject();
             return object;
         } catch (IOException ex) {
             Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
@@ -51,7 +49,7 @@ public class MessageHandler extends Thread {
             Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                objIn.close();
+                objectIn.close();
             } catch (IOException ex) {
                 Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -63,18 +61,16 @@ public class MessageHandler extends Thread {
     public void run () {
         Object object = deserialize_object(message);
         String objectName = object.getClass().getName();
-        //System.out.println("Class name: " + objectName);
         
         switch(objectName){
             case "bitcoin.UserInformation":
-                //Hello message
-                handle_hello_message(UserInformation.class.cast(object));
+                handleHelloMessage(UserInformation.class.cast(object));
                 break;
             case "bitcoin.Database":
-                handle_database_message(Database.class.cast(object));
+                handleDatabaseMessage(Database.class.cast(object));
                 break;
             case "bitcoin.messages.ExitMessage":
-                handle_exit_message(ExitMessage.class.cast(object));
+                handleExitMessage(ExitMessage.class.cast(object));
                 break;
             case "bitcoin.messages.BuyMessage":
                 handleBuyMessage(BuyMessage.class.cast(object));
@@ -91,44 +87,47 @@ public class MessageHandler extends Thread {
         }
     }
     
-    public void handle_hello_message(UserInformation userInformation) {
-        //ignore my own message
+    public void handleHelloMessage(UserInformation userInformation) {
+        // If message came from myself, ignore it
         if (!userInformation.getUsername().equals(myPeer.getUsername())) {
-            System.out.println("Received Hello Message");
-            //add new user to database
+            System.out.println("Received Hello message");
+            
+            // Add new user to database
             myPeer.databaseAddUserInformation(userInformation);
             myPeer.sendUnicastMessage("database", userInformation.getUnicastPort(), "", 0);
         }
     }
     
-    public synchronized void handle_database_message(Database database) {
+    public synchronized void handleDatabaseMessage(Database database) {
         System.out.println("Received Database message");
         myPeer.setDatabase(database);
     }
     
-    public void handle_exit_message(ExitMessage exitMessage){
-        System.out.println("Received Exit Message");
+    public void handleExitMessage(ExitMessage exitMessage){
+        System.out.println("Received Exit message");
         myPeer.databaseRemoveUserInformation(exitMessage.getUserInformation());
     }
     
     public void handleBuyMessage(BuyMessage buyMessage){
-        System.out.println("Received Buy Message");
+        System.out.println("Received Buy message");
         System.out.println("User " + buyMessage.getBuyerUsername() + 
-                " wants to buy " + buyMessage.getCoins() + " coins." +
+                " wants to buy " + buyMessage.getCoins() + " coins " +
                 "from: "+buyMessage.getSellerUsername());
-        // Ask to send transaction message  
+
+        // Sends transaction message  
         myPeer.sendTransactionMessage(buyMessage);
     }
 
     public void handleTransactionMessage(TransactionMessage transactionMessage) {
-        System.out.println("Received Transaction Message");
-        //call Mining method
+        System.out.println("Received Transaction message");
+        
+        // Starts mining process for this transaction
         Miner miner = new Miner(transactionMessage, myPeer);
         miner.start();
     }
 
     public void handleMiningMessage(MiningMessage miningMessage) {
-        System.out.println("Received Mining Message");
+        System.out.println("Received Mining message");
         Database database = myPeer.getDatabase();
         for (int i = 0; i < database.getNumberOfTransactions(); i++) {
             MiningMessage temp = (MiningMessage) database.getArrayTransactions().get(i);
@@ -137,17 +136,21 @@ public class MessageHandler extends Thread {
                 //System.out.println("Current timestamp is: " + temp.getTimestamp());
                 //System.out.println("Next timestamp will be: " + miningMessage.getTimestamp());
                 //database.getArrayTransactions().set(i, miningMessage);
-                System.out.println("ERROR | Sorry, another peer mined it quickly");
+                System.out.println("ERROR | Sorry, another peer mined it before you");
                 return;
             }
         }
         
+        // Adds official miner to the database
         database.getArrayTransactions().add(miningMessage);
+
+        // Gathers info from the transaction
         String buyerUsername = miningMessage.getBuyerUsername();
         String sellerUsername = miningMessage.getSellerUsername();
         String minerUsername = miningMessage.getMinerUsername();
         int ammount = miningMessage.getAmmount();
         
+        // Performs credits and debits on accounts
         for (int i = 0; i < database.getNumberOfUsers(); i++) {
             UserInformation temp = (UserInformation) database.getArrayUserInformation().get(i);
 
@@ -163,9 +166,11 @@ public class MessageHandler extends Thread {
                 temp.setCoins(temp.getCoins() + REWARD_VALUE);
             }
             
+            // Updates database with credits and debits performed on this transaction
             database.getArrayUserInformation().set(i, temp);
         }
         
+        // Sends updated database to all peers
         try {
             MessageSender sender = new MessageSender(myPeer.getMulticastSocket());
             sender.updateDatabase(database);

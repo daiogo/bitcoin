@@ -5,9 +5,7 @@
  */
 package bitcoin;
 
-import java.io.*;
 import java.security.*;
-import java.util.Arrays;
 
 /**
  *
@@ -22,20 +20,19 @@ public class Wallet {
         generateKeys();
     }
     
-    public byte[] getEncodedPublicKey(){
+    public byte[] getEncodedPublicKey() {
         return publicKey.getEncoded();
     }
     
-    public PublicKey getPublicKey(){
+    public PublicKey getPublicKey() {
         return publicKey;
     }
     
-    private void generateKeys(){
+    private void generateKeys() {
         
         /* Generate a DSA signature */
         try{
             /* Generate a key pair */
-
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA", "SUN");
             SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
 
@@ -45,59 +42,24 @@ public class Wallet {
             privateKey = pair.getPrivate();
             publicKey = pair.getPublic();
             
-            /* Save the public key in a file */
-            /*
-            byte[] key = publicKey.getEncoded();
-
-            FileOutputStream keyfos = new FileOutputStream("publicKey");
-            keyfos.write(key);
-
-            keyfos.close();
-            */
-            System.out.println("Key created!");
-            //System.out.println(Arrays.toString(publicKey.getEncoded()));
-            
         } catch (Exception e) {
             System.err.println("Caught exception " + e.toString());
         }
     }
     
     public byte[] signFile(byte[] buffer) {
-
         byte[] realSig = null;
+
         try {
             /* Create a Signature object and initialize it with the private key */
 
             Signature dsa = Signature.getInstance("SHA1withDSA", "SUN"); 
 
             dsa.initSign(privateKey);
-
-            /* Update and sign the data */
-/*
-            FileInputStream fis = new FileInputStream(nameOfFileToSign);
-            BufferedInputStream bufin = new BufferedInputStream(fis);
-            byte[] buffer = new byte[1024];
-            int len;
-            while (bufin.available() != 0) {
-                len = bufin.read(buffer);
-                dsa.update(buffer, 0, len);
-            };
-*/
+            
             dsa.update(buffer, 0, buffer.length);
-            //bufin.close();
-
-            /* Now that all the data to be signed has been read in, 
-                    generate a signature for it */
 
             realSig = dsa.sign();
-            
-            /* Save the signature in a file */
-            /*
-            FileOutputStream sigfos = new FileOutputStream("sig");
-            sigfos.write(realSig);
-
-            sigfos.close();
-            */
 
         } catch (Exception e) {
             System.err.println("Caught exception " + e.toString());

@@ -16,24 +16,25 @@ public class UDPServer extends Thread{
     }
     
     public void run(){ 
-        DatagramSocket aSocket = null;
+        DatagramSocket serverSocket = null;
 
         System.out.println("UDP Server Started on port " + unicastPort);
         try{
-            aSocket = new DatagramSocket(unicastPort);
-            // create socket at agreed port
+            serverSocket = new DatagramSocket(unicastPort);
+            // Create socket at given port
             byte[] buffer = new byte[MAX_UDP_MESSAGE_SIZE];
             while(true){
                 DatagramPacket request = new DatagramPacket(buffer, buffer.length);
-                aSocket.receive(request);     
+                serverSocket.receive(request);
                 DatagramPacket inPacket = new DatagramPacket(request.getData(), request.getLength(), 
                     request.getAddress(), request.getPort());
-                //System.out.println("Unicast Message Received");
-                MessageHandler handler = new MessageHandler(inPacket.getData(),myPeer);
-                handler.run();
+                
+                // Starts handler thread to handle message properly
+                MessageHandler handler = new MessageHandler(inPacket.getData(), myPeer);
+                handler.start();
             }
         }catch (SocketException e){System.out.println("Socket: " + e.getMessage());
         }catch (IOException e) {System.out.println("IO: " + e.getMessage());
-        }finally {if(aSocket != null) aSocket.close();}
+        }finally {if(serverSocket != null) serverSocket.close();}
     }
 }

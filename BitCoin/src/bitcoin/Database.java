@@ -6,7 +6,6 @@
 package bitcoin;
 
 import bitcoin.messages.MiningMessage;
-import bitcoin.messages.TransactionMessage;
 import java.io.Serializable;
 import java.security.PublicKey;
 import java.util.ArrayList;
@@ -15,7 +14,7 @@ import java.util.ArrayList;
  *
  * @author diego
  */
-public class Database implements Serializable{
+public class Database implements Serializable {
     private ArrayList <UserInformation> arrayUserInformation;
     private ArrayList <MiningMessage> arrayTransactions;
     private int numberOfUsers;
@@ -28,17 +27,17 @@ public class Database implements Serializable{
         numberOfTransactions = 0;
     }
     
-    public synchronized void addUserInformation(UserInformation userInformation){
+    public synchronized void addUserInformation(UserInformation userInformation) {
         arrayUserInformation.add(userInformation);
     }
     
-    public synchronized void removeUserInformation(UserInformation userInformation){
+    public synchronized void removeUserInformation(UserInformation userInformation) {
         System.out.println("Remove User: " + userInformation.getUsername());
         //The hashCode() and equals() are a bit different because of serialization?
         //so remove(object) does not work
         //System.out.println("Contains? " + arrayUserInformation.contains(userInformation));
         
-        for (int i=0; i<arrayUserInformation.size();i++){
+        for (int i = 0; i < arrayUserInformation.size(); i++) {
             UserInformation temp = (UserInformation) arrayUserInformation.get(i);
             if (temp.getUsername().equals(userInformation.getUsername())){
                 arrayUserInformation.remove(i);
@@ -55,8 +54,7 @@ public class Database implements Serializable{
                 return temp.getPublicKey();
             }
         }
-        PublicKey publicKey = null;
-        return publicKey;
+        return null;
     }
     
     public int getUnicastPort(String username) {

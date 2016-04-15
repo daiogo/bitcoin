@@ -5,23 +5,23 @@
  */
 package bitcoin.peerClient;
 
-//bitcoin package
+// bitcoin package
 import static bitcoin.Peer.GROUP_IP;
 import static bitcoin.Peer.MULTICAST_PORT;
 import bitcoin.Database;
 import bitcoin.UserInformation;
 import bitcoin.Wallet;
 
-//peerClient package
+// peerClient package
 import bitcoin.peerClient.UDPClient;
 
-//messages package
+// messages package
 import bitcoin.messages.BuyMessage;
 import bitcoin.messages.ExitMessage;
 import bitcoin.messages.MiningMessage;
 import bitcoin.messages.TransactionMessage;
 
-//java
+// java imports
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -29,21 +29,9 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
-import java.security.PublicKey;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-/*
-Multicast Messages:
-hello = hello,username,coinPrice,port,publicKey
-mining = mining,username,transaction,valid(true/false)
-byebye = byebye,username
-
-Unicast Messages:
-buy = buy,username
-database = database
-*/
 
 public class MessageSender {
     private DatagramPacket outPacket;
@@ -55,8 +43,9 @@ public class MessageSender {
         this.group = InetAddress.getByName(GROUP_IP);   
     }
     
-    public static byte[] serialize_object(Object object){
+    public static byte[] serialize_object(Object object) {
         byte[] serialized_object = null;
+        
         try {
             ObjectOutputStream objectOut = null;
             ByteArrayOutputStream byteOut = new ByteArrayOutputStream();

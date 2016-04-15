@@ -6,7 +6,6 @@
 package bitcoin.peerServer;
 
 import bitcoin.Peer;
-import bitcoin.peerServer.UDPServer;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
@@ -34,8 +33,7 @@ public class MessageListener extends Thread {
     
     public void startUDPServer(int unicastPort){
         udpServer = new UDPServer(unicastPort, myPeer);
-        udpServer.start();        
-        
+        udpServer.start();
     }
     
     public void setExit(boolean exit) {
@@ -47,17 +45,18 @@ public class MessageListener extends Thread {
         
         while (exit == false) { 
             try {
+                // Receives packet
                 byte buffer[] = new byte[MAX_UDP_MESSAGE_SIZE];
                 inPacket = new DatagramPacket(buffer, buffer.length);
                 socket.receive(inPacket);
-                //System.out.println("Received Multicast Message");
+                
+                // Starts new handler thread to handle the message properly
                 MessageHandler handler = new MessageHandler(inPacket.getData(), myPeer);
                 handler.start();
             } catch (IOException ex) {
                 Logger.getLogger(MessageListener.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        System.out.println("Receiver thread finished");
     }
     
 }

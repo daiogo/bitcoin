@@ -5,10 +5,6 @@
  */
 package bitcoin;
 
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
  * @author diego
@@ -33,7 +29,7 @@ public class BitCoin {
         */
 	Peer peer = new Peer(args[0], Integer.parseInt(args[1]), args[2]);
 	//peer.test_signature();
-        peer.init_peer();
+        peer.initPeer();
         //peer.start();
     }
     

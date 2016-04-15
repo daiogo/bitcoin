@@ -2,8 +2,7 @@ package bitcoin.peerClient;
 
 import java.net.*;
 import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 public class UDPClient{
     public static final int MAX_UDP_MESSAGE_SIZE = 65535;
     private int unicastPort;
@@ -14,35 +13,34 @@ public class UDPClient{
     
     
     public void sendDatabase(byte[] byteDatabase) { 
-        // args give message contents and destination hostname
-        DatagramSocket aSocket = null;
+        DatagramSocket clientSocket = null;
+        
         try {
-            aSocket = new DatagramSocket();    
-            InetAddress aHost = InetAddress.getByName("localhost");
+            clientSocket = new DatagramSocket();    
+            InetAddress clientHost = InetAddress.getByName("localhost");
             int serverPort = unicastPort;		                                                 
             DatagramPacket request =
-                    new DatagramPacket(byteDatabase, byteDatabase.length, aHost, serverPort);
-            aSocket.send(request);
-            System.out.println("Database Message Sent to "+ unicastPort);
-	
+                    new DatagramPacket(byteDatabase, byteDatabase.length, clientHost, serverPort);
+            clientSocket.send(request);
+ 
         }catch (SocketException e){System.out.println("Socket: " + e.getMessage());
         }catch (IOException e){System.out.println("IO: " + e.getMessage());
-        }finally {if(aSocket != null) aSocket.close();}
+        }finally {if(clientSocket != null) clientSocket.close();}
     }	
     
     public void sendBuy(byte[] buyMessage) {  
-        DatagramSocket aSocket = null;
+        DatagramSocket clientSocket = null;
+        
         try {
-            aSocket = new DatagramSocket();    
-            InetAddress aHost = InetAddress.getByName("localhost");
+            clientSocket = new DatagramSocket();    
+            InetAddress clientHost = InetAddress.getByName("localhost");
             int serverPort = unicastPort;		                                                 
             DatagramPacket request =
-                    new DatagramPacket(buyMessage, buyMessage.length, aHost, serverPort);
-            aSocket.send(request);
-            System.out.println("Database Message Sent to "+ unicastPort);
-	
+                    new DatagramPacket(buyMessage, buyMessage.length, clientHost, serverPort);
+            clientSocket.send(request);
+            
         }catch (SocketException e){System.out.println("Socket: " + e.getMessage());
         }catch (IOException e){System.out.println("IO: " + e.getMessage());
-        }finally {if(aSocket != null) aSocket.close();}
+        }finally {if(clientSocket != null) clientSocket.close();}
     }
 }
