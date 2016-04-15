@@ -81,8 +81,15 @@ public class Miner extends Thread {
             Logger.getLogger(Miner.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+        //Buyer can't be the same as seller
+        if (buyerUsername.equals(sellerUsername)){
+            System.out.println("ERROR | Seller can't be the same as Buyer, transaction cancelled");
+            return;
+        }
+        
         // Verifies signature
         boolean signatureMatches = verifySignature(myPeer.getDatabase().getPublicKey(sellerUsername), encryptedBuyMessage, serializedBuyMessage);
+        
         if (!signatureMatches) {
             System.out.println("ERROR | Signature doesn't match, transaction cancelled");
             return;
@@ -113,7 +120,6 @@ public class Miner extends Thread {
             } catch (IOException ex) {
                 Logger.getLogger(Miner.class.getName()).log(Level.SEVERE, null, ex);
             }            
-            
         }
     }
 }

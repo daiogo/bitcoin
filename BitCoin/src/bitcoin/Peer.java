@@ -77,8 +77,8 @@ public class Peer {
         } catch (IOException ex) {
             Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
         }
-        debugThread = new DebugThread(this);
-        debugThread.start();
+        //debugThread = new DebugThread(this);
+        //debugThread.start();
     }
 
     public MulticastSocket getMulticastSocket() {
@@ -90,12 +90,14 @@ public class Peer {
             switch (command) {
                 case "hello":
                     messageSender.sendHello(myUserInformation);
+                    windowAddMessageSent("Hello");
                     break;
                 case "exit":
                     messageSender.sendExit(myUserInformation);
                     exit = true;
                     messageListener.setExit(exit);
                     System.out.println("Exiting...");
+                    windowAddMessageSent("Exit");
                     break;
                 case "help":
                     System.out.println("Commands Help:");
@@ -112,6 +114,7 @@ public class Peer {
     public void sendTransactionMessage(BuyMessage buyMessage) {
         try {
             messageSender.sendTransaction(buyMessage, wallet);
+            windowAddMessageSent("Transaction");
         } catch (IOException ex) {
             Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -122,6 +125,7 @@ public class Peer {
             switch (command) {
                 case "database":
                     messageSender.sendDatabase(database, unicastPort);
+                    windowAddMessageSent("Database");
                     break;
                 case "buy":
                     //if (database.getNumberOfUsers() >= MIN_USERS) {
@@ -131,6 +135,7 @@ public class Peer {
                     //    System.out.println("ERROR | You may only perform a transaction when at least 4 users are in the network.");
                     //    System.out.println("      | There are currently " + database.getNumberOfUsers() + " users.");
                     //}
+                    windowAddMessageSent("Buy");
                     break;
                 default:
                     
@@ -206,6 +211,14 @@ public class Peer {
     
     public Database getDatabase() {
         return database;
+    }
+    
+    public void windowAddMessageSent(String messageSent){
+        peerWindow.addMessageSentText(messageSent);
+    }
+    
+    public void windowAddMessageReceived(String messageReceived){
+        peerWindow.addMessageReceivedText(messageReceived);
     }
     
 }

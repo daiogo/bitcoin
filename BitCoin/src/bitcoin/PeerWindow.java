@@ -41,6 +41,23 @@ public class PeerWindow extends javax.swing.JFrame {
             usersList.add(s);
         }
     }
+    
+    public void addMessageSentText(String messageSent){
+        String text = textAreaMessagesSent.getText();
+        text = text.concat(messageSent);
+        text = text.concat("\n");
+        textAreaMessagesSent.setText(text);
+        textAreaMessagesSent.setCaretPosition(textAreaMessagesSent.getDocument().getLength());
+    }
+    
+    public void addMessageReceivedText(String messageReceived){
+        String text = textAreaMessagesReceived.getText();
+        text = text.concat(messageReceived);
+        text = text.concat("\n");
+        textAreaMessagesReceived.setText(text);
+        textAreaMessagesReceived.setCaretPosition(textAreaMessagesReceived.getDocument().getLength());
+    }
+    
     /*
     public synchronized void updateDatabase(Database database){
         ArrayList arrayUserInformation = database.getArrayUserInformation();
@@ -112,11 +129,11 @@ public class PeerWindow extends javax.swing.JFrame {
         jList3 = new javax.swing.JList<>();
         label_welcome = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        text_area_messages_received = new javax.swing.JTextArea();
+        textAreaMessagesReceived = new javax.swing.JTextArea();
         label_message_received = new javax.swing.JLabel();
         label_message_sent = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        text_area_messages_sent = new javax.swing.JTextArea();
+        textAreaMessagesSent = new javax.swing.JTextArea();
         button_exit = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
         jPanel1 = new javax.swing.JPanel();
@@ -154,19 +171,19 @@ public class PeerWindow extends javax.swing.JFrame {
         label_welcome.setFont(new java.awt.Font("Noto Sans", 0, 18)); // NOI18N
         label_welcome.setText("Welcome $username");
 
-        text_area_messages_received.setEditable(false);
-        text_area_messages_received.setColumns(20);
-        text_area_messages_received.setRows(5);
-        jScrollPane2.setViewportView(text_area_messages_received);
+        textAreaMessagesReceived.setEditable(false);
+        textAreaMessagesReceived.setColumns(20);
+        textAreaMessagesReceived.setRows(5);
+        jScrollPane2.setViewportView(textAreaMessagesReceived);
 
         label_message_received.setText("Messages Received:");
 
         label_message_sent.setText("Messages Sent:");
 
-        text_area_messages_sent.setEditable(false);
-        text_area_messages_sent.setColumns(20);
-        text_area_messages_sent.setRows(5);
-        jScrollPane3.setViewportView(text_area_messages_sent);
+        textAreaMessagesSent.setEditable(false);
+        textAreaMessagesSent.setColumns(20);
+        textAreaMessagesSent.setRows(5);
+        jScrollPane3.setViewportView(textAreaMessagesSent);
 
         button_exit.setText("Exit");
         button_exit.addActionListener(new java.awt.event.ActionListener() {
@@ -347,8 +364,8 @@ public class PeerWindow extends javax.swing.JFrame {
     private javax.swing.JLabel label_message_received;
     private javax.swing.JLabel label_message_sent;
     private javax.swing.JLabel label_welcome;
-    private javax.swing.JTextArea text_area_messages_received;
-    private javax.swing.JTextArea text_area_messages_sent;
+    private javax.swing.JTextArea textAreaMessagesReceived;
+    private javax.swing.JTextArea textAreaMessagesSent;
     private java.awt.List usersList;
     // End of variables declaration//GEN-END:variables
 }

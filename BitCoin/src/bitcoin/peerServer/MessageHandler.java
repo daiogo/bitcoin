@@ -74,12 +74,15 @@ public class MessageHandler extends Thread {
                 break;
             case "bitcoin.messages.BuyMessage":
                 handleBuyMessage(BuyMessage.class.cast(object));
+                myPeer.windowAddMessageReceived("Buy");
                 break;
             case "bitcoin.messages.TransactionMessage":
                 handleTransactionMessage(TransactionMessage.class.cast(object));
+                myPeer.windowAddMessageReceived("Transaction");
                 break;
             case "bitcoin.messages.MiningMessage":
                 handleMiningMessage(MiningMessage.class.cast(object));
+                myPeer.windowAddMessageReceived("Mining");
                 break;
             default:
                 System.out.println("Message received class not found: " + objectName);
@@ -136,7 +139,7 @@ public class MessageHandler extends Thread {
                 //System.out.println("Current timestamp is: " + temp.getTimestamp());
                 //System.out.println("Next timestamp will be: " + miningMessage.getTimestamp());
                 //database.getArrayTransactions().set(i, miningMessage);
-                System.out.println("ERROR | Sorry, another peer mined it before you");
+                System.out.println("ERROR | Sorry, another peer mined it faster");
                 return;
             }
         }
