@@ -65,12 +65,15 @@ public class MessageHandler extends Thread {
         switch(objectName){
             case "bitcoin.UserInformation":
                 handleHelloMessage(UserInformation.class.cast(object));
+                myPeer.windowAddMessageReceived("Database");
                 break;
             case "bitcoin.Database":
                 handleDatabaseMessage(Database.class.cast(object));
+                myPeer.windowAddMessageReceived("Database");
                 break;
             case "bitcoin.messages.ExitMessage":
                 handleExitMessage(ExitMessage.class.cast(object));
+                myPeer.windowAddMessageReceived("Exit");
                 break;
             case "bitcoin.messages.BuyMessage":
                 handleBuyMessage(BuyMessage.class.cast(object));
