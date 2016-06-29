@@ -67,11 +67,11 @@ public class Database implements Serializable {
         return 0;
     }
 
-    public ArrayList getArrayUserInformation() {
+    public ArrayList<UserInformation> getArrayUserInformation() {
         return arrayUserInformation;
     }
 
-    public ArrayList getArrayTransactions() {
+    public ArrayList<MiningMessage> getArrayTransactions() {
         return arrayTransactions;
     }
 

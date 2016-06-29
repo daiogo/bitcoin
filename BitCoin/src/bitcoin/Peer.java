@@ -144,12 +144,7 @@ public class Peer {
             Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    
-    public String getUsername() {
-        return username;
-    }
-    
+
     public void exitProgram() throws IOException {
         // Exits group and close socket
         multicastSocket.leaveGroup(group);
@@ -178,7 +173,7 @@ public class Peer {
             mutex.acquire();
             try {
                 database.addUserInformation(userInformation);
-                peerWindow.updateDatabase(database);
+                updateDatabaseTable();
             } finally {
                 mutex.release();
             }
@@ -192,7 +187,7 @@ public class Peer {
             mutex.acquire();
             try {
                 database.removeUserInformation(userInformation);
-                peerWindow.updateDatabase(database);
+                updateDatabaseTable();
             } finally {
                 mutex.release();
             }
@@ -202,8 +197,23 @@ public class Peer {
     }
     
     public synchronized void updateDatabaseTable() {
-        peerWindow.updateDatabase(database);
+        // Uses mutex to prevent database corruption during update
+        try {
+            mutex.acquire();
+            try {
+                peerWindow.updateDatabase(database);
+            } finally {
+                mutex.release();
+            }
+        } catch(InterruptedException ie) {
+            Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ie);
+        }        
     }
+    
+    public String getUsername() {
+        return username;
+    }
+    
     
     public void printDatabase() {
         database.printDatabase();
