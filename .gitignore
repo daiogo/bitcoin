@@ -8,3 +8,6 @@
 #arquivos de chave
 BitCoin/publicKey 
 BitCoin/sig 
+
+#database files
+".dat"

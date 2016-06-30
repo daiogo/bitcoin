@@ -16,7 +16,7 @@ public class BitCoin {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         if(args.length < 3){
             System.out.println("Please use three arguments: ID PORT CoinPrice");
             System.exit(0);

@@ -78,8 +78,12 @@ public class MessageHandler extends Thread {
             System.out.println(myPeer.getUsername() + "Received Hello message");
             
             // Add new user to database
-            myPeer.databaseAddUserInformation(userInformation);
-            myPeer.sendUnicastMessage("database", userInformation.getUnicastPort(), "", 0);
+            Database database = myPeer.getDatabase();
+            //if user is new, add
+            if(!database.containsUser(userInformation.getUsername())){
+                myPeer.databaseAddUserInformation(userInformation);
+                myPeer.sendUnicastMessage("database", userInformation.getUnicastPort(), "", 0);
+            }
         }
     }
     
@@ -90,7 +94,7 @@ public class MessageHandler extends Thread {
     
     public void handleExitMessage(ExitMessage exitMessage){
         System.out.println("Received Exit message");
-        myPeer.databaseRemoveUserInformation(exitMessage.getUserInformation());
+        //myPeer.databaseRemoveUserInformation(exitMessage.getUserInformation());
     }
     
     public void handleBuyMessage(BuyMessage buyMessage){

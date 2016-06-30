@@ -88,8 +88,12 @@ public class Database implements Serializable {
 
     public void printDatabase() {
         System.out.println("Print Database: ");
+        UserInformation userInformation;
         for (int i=0; i < arrayUserInformation.size(); i++){
-            System.out.println(arrayUserInformation.get(i).getUsername());
+            userInformation = arrayUserInformation.get(i);
+            System.out.println(userInformation.getUsername() + "," +
+                               userInformation.getCoins() + "," +
+                               userInformation.getCoinPrice());
         }    
     }
     
@@ -101,4 +105,14 @@ public class Database implements Serializable {
         return myUserInformation;
     }
 
+    public boolean containsUser(String user){
+        String username;
+        for (int i=0; i < arrayUserInformation.size(); i++){
+            username = arrayUserInformation.get(i).getUsername();
+            if(username.equals(user)){
+                return true;
+            }
+        }    
+        return false;
+    }
 }

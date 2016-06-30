@@ -40,36 +40,33 @@ public class Peer {
     
     static Semaphore mutex = new Semaphore(1);
     
-    public Peer(String username, int unicastPort, String coinPrice) throws IOException {
+    public Peer(String username, int unicastPort, String coinPrice) throws IOException, InterruptedException {
         this.username = username;
         this.unicastPort = unicastPort;
         this.wallet = new Wallet();
 
-        /*
-        File f = new File("./" + username);
+        mutex.acquire();
+        
+        File f = new File("./" + username + ".txt");
         if(f.exists() && !f.isDirectory()) { 
             readDatabaseFromFile();
-            this.myUserInformation = database.getMyUserInformation();
+            myUserInformation = database.getMyUserInformation();
         } else {
             System.out.println("File does not exists");
             this.database = new Database();
-            this.myUserInformation = new UserInformation(username, 100, coinPrice, unicastPort, this.wallet.getPublicKey());
+            myUserInformation = new UserInformation(username, 100, coinPrice, unicastPort, this.wallet.getPublicKey());
             this.database.addUserInformation(myUserInformation);
             this.database.setMyUserInformation(myUserInformation);
         }
-        */
         
-        this.database = new Database();
-        this.myUserInformation = new UserInformation(username, 100, coinPrice, unicastPort, this.wallet.getPublicKey());
-        this.database.addUserInformation(myUserInformation);
-        this.database.setMyUserInformation(myUserInformation);
-        
+        System.out.println("Peer Constructor: " + myUserInformation.getUsername());
         peerWindow = new PeerWindow(myUserInformation, this);
         peerWindow.setVisible(true);
  
         this.coinPrice = coinPrice;
         peerWindow.updateDatabase(database);
 
+        mutex.release();
     }
     
     
@@ -182,7 +179,7 @@ public class Peer {
             try {
                 this.database = database;
                 peerWindow.updateDatabase(database);
-                //saveDatabaseToFile();
+                saveDatabaseToFile();
             } finally {
                 mutex.release();
             }
@@ -198,7 +195,7 @@ public class Peer {
             try {
                 database.addUserInformation(userInformation);
                 peerWindow.updateDatabase(database);
-                //saveDatabaseToFile();
+                saveDatabaseToFile();
             } finally {
                 mutex.release();
             }
@@ -213,7 +210,7 @@ public class Peer {
             try {
                 database.removeUserInformation(userInformation);
                 peerWindow.updateDatabase(database);
-                //saveDatabaseToFile();
+                saveDatabaseToFile();
             } finally {
                 mutex.release();
             }
@@ -222,14 +219,16 @@ public class Peer {
         }
     }
    
-    public void saveDatabaseToFile() {
+    private void saveDatabaseToFile() {
         ObjectOutputStream oos = null;
         FileOutputStream fout = null;
         try{
-            fout = new FileOutputStream("./" + username, true);
+            fout = new FileOutputStream("./" + username+".txt", true);
             oos = new ObjectOutputStream(fout);
             oos.writeObject(database);
-            System.out.println("File saved: "+username);
+            oos.flush();    
+            System.out.println("\nFile saved: "+username+".txt");
+            database.printDatabase();
         } catch (Exception ex) {
         } finally {
             if(oos  != null){
@@ -241,7 +240,7 @@ public class Peer {
             }  
             if(fout  != null){
                 try {
-                    oos.close();
+                    fout.close();
                 } catch (IOException ex) {
                     Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -253,10 +252,11 @@ public class Peer {
         ObjectInputStream objectinputstream = null;
         FileInputStream streamIn = null;
         try {
-            streamIn = new FileInputStream("./" + username);
+            streamIn = new FileInputStream("./" + username + ".txt");
             objectinputstream = new ObjectInputStream(streamIn);
             database = (Database) objectinputstream.readObject();
-            System.out.println("File read: "+username);
+            System.out.println("File read: "+username + ".txt");
+            database.printDatabase();
         } catch (IOException | ClassNotFoundException e) {
         } finally {
             if(objectinputstream != null){
