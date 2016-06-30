@@ -8,6 +8,7 @@ package bitcoin.peerServer;
 import bitcoin.Database;
 import bitcoin.peerClient.MessageSender;
 import bitcoin.Miner;
+import bitcoin.ObjectSerializer;
 import bitcoin.Peer;
 import bitcoin.UserInformation;
 import bitcoin.messages.BuyMessage;
@@ -34,32 +35,10 @@ public class MessageHandler extends Thread {
         myPeer = peer;
         this.message = message;
     }
-    
-    public static Object deserialize_object(byte[] message) {
-        ObjectInputStream objectIn = null;
-        Object object = null;
-        try {
-            ByteArrayInputStream byteIn = new ByteArrayInputStream(message);
-            objectIn = new ObjectInputStream(byteIn);
-            object = objectIn.readObject();
-            return object;
-        } catch (IOException ex) {
-            Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                objectIn.close();
-            } catch (IOException ex) {
-                Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        return object;
-    }
-    
+        
     @Override
     public void run () {
-        Object object = deserialize_object(message);
+        Object object = ObjectSerializer.deserialize_object(message);
         String objectName = object.getClass().getName();
         
         switch(objectName){
@@ -96,7 +75,7 @@ public class MessageHandler extends Thread {
     public void handleHelloMessage(UserInformation userInformation) {
         // If message came from myself, ignore it
         if (!userInformation.getUsername().equals(myPeer.getUsername())) {
-            System.out.println("Received Hello message");
+            System.out.println(myPeer.getUsername() + "Received Hello message");
             
             // Add new user to database
             myPeer.databaseAddUserInformation(userInformation);

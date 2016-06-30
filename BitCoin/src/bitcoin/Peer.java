@@ -40,18 +40,38 @@ public class Peer {
     
     static Semaphore mutex = new Semaphore(1);
     
-    public Peer(String username, int unicastPort, String coinPrice) {
+    public Peer(String username, int unicastPort, String coinPrice) throws IOException {
         this.username = username;
         this.unicastPort = unicastPort;
         this.wallet = new Wallet();
+
+        /*
+        File f = new File("./" + username);
+        if(f.exists() && !f.isDirectory()) { 
+            readDatabaseFromFile();
+            this.myUserInformation = database.getMyUserInformation();
+        } else {
+            System.out.println("File does not exists");
+            this.database = new Database();
+            this.myUserInformation = new UserInformation(username, 100, coinPrice, unicastPort, this.wallet.getPublicKey());
+            this.database.addUserInformation(myUserInformation);
+            this.database.setMyUserInformation(myUserInformation);
+        }
+        */
+        
         this.database = new Database();
         this.myUserInformation = new UserInformation(username, 100, coinPrice, unicastPort, this.wallet.getPublicKey());
         this.database.addUserInformation(myUserInformation);
-        this.coinPrice = coinPrice;
+        this.database.setMyUserInformation(myUserInformation);
+        
         peerWindow = new PeerWindow(myUserInformation, this);
         peerWindow.setVisible(true);
-        updateDatabaseTable();
+ 
+        this.coinPrice = coinPrice;
+        peerWindow.updateDatabase(database);
+
     }
+    
     
     public void initPeer() {
         try {
@@ -152,13 +172,17 @@ public class Peer {
             multicastSocket.close();
     }
     
-    public synchronized void setDatabase(Database database) {
+    
+    // ----------------- Database Methods -----------------
+    
+    public void setDatabase(Database database) {
         // Uses mutex to prevent database corruption during update
         try {
             mutex.acquire();
             try {
                 this.database = database;
-                updateDatabaseTable();
+                peerWindow.updateDatabase(database);
+                //saveDatabaseToFile();
             } finally {
                 mutex.release();
             }
@@ -167,13 +191,14 @@ public class Peer {
         }
     }
     
-    public synchronized void databaseAddUserInformation(UserInformation userInformation) {
+    public void databaseAddUserInformation(UserInformation userInformation) {
         // Uses mutex to prevent database corruption during update
         try {
             mutex.acquire();
             try {
                 database.addUserInformation(userInformation);
-                updateDatabaseTable();
+                peerWindow.updateDatabase(database);
+                //saveDatabaseToFile();
             } finally {
                 mutex.release();
             }
@@ -182,12 +207,13 @@ public class Peer {
         }
     }
     
-    public synchronized void databaseRemoveUserInformation(UserInformation userInformation) {
+    public void databaseRemoveUserInformation(UserInformation userInformation) {
         try {
             mutex.acquire();
             try {
                 database.removeUserInformation(userInformation);
-                updateDatabaseTable();
+                peerWindow.updateDatabase(database);
+                //saveDatabaseToFile();
             } finally {
                 mutex.release();
             }
@@ -195,25 +221,57 @@ public class Peer {
             Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ie);
         }
     }
-    
-    public synchronized void updateDatabaseTable() {
-        // Uses mutex to prevent database corruption during update
-        try {
-            mutex.acquire();
-            try {
-                peerWindow.updateDatabase(database);
-            } finally {
-                mutex.release();
-            }
-        } catch(InterruptedException ie) {
-            Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ie);
-        }        
+   
+    public void saveDatabaseToFile() {
+        ObjectOutputStream oos = null;
+        FileOutputStream fout = null;
+        try{
+            fout = new FileOutputStream("./" + username, true);
+            oos = new ObjectOutputStream(fout);
+            oos.writeObject(database);
+            System.out.println("File saved: "+username);
+        } catch (Exception ex) {
+        } finally {
+            if(oos  != null){
+                try {
+                    oos.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }  
+            if(fout  != null){
+                try {
+                    oos.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }  
+        }
     }
+    
+    private void readDatabaseFromFile() throws IOException {
+        ObjectInputStream objectinputstream = null;
+        FileInputStream streamIn = null;
+        try {
+            streamIn = new FileInputStream("./" + username);
+            objectinputstream = new ObjectInputStream(streamIn);
+            database = (Database) objectinputstream.readObject();
+            System.out.println("File read: "+username);
+        } catch (IOException | ClassNotFoundException e) {
+        } finally {
+            if(objectinputstream != null){
+                objectinputstream.close();
+            }          
+            if(streamIn != null){
+                streamIn.close();
+            } 
+        }
+    }
+
     
     public String getUsername() {
         return username;
     }
-    
     
     public void printDatabase() {
         database.printDatabase();

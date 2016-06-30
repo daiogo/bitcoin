@@ -9,6 +9,7 @@ package bitcoin.peerClient;
 import static bitcoin.Peer.GROUP_IP;
 import static bitcoin.Peer.MULTICAST_PORT;
 import bitcoin.Database;
+import bitcoin.ObjectSerializer;
 import bitcoin.UserInformation;
 import bitcoin.Wallet;
 
@@ -43,38 +44,23 @@ public class MessageSender {
         this.group = InetAddress.getByName(GROUP_IP);   
     }
     
-    public static byte[] serialize_object(Object object) {
-        byte[] serialized_object = null;
-        
-        try {
-            ObjectOutputStream objectOut = null;
-            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-            objectOut = new ObjectOutputStream(byteOut);
-            objectOut.writeObject(object);
-            serialized_object = byteOut.toByteArray();
-            return serialized_object;
-        } catch (IOException ex) {
-            Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return serialized_object;
-    }   
-    
-    public void sendHello(UserInformation userInformation) throws IOException {        
-        byte[] messageBytes = serialize_object(userInformation);
+    public void sendHello(UserInformation userInformation) throws IOException {      
+        System.out.println("Sending Hello Message");
+        byte[] messageBytes = ObjectSerializer.serialize_object(userInformation);
         
         outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
         socket.send(outPacket);
     }
     
     public void sendDatabase(Database database, int unicastPort) throws IOException {        
-        byte[] messageBytes = serialize_object(database);
+        byte[] messageBytes = ObjectSerializer.serialize_object(database);
         UDPClient udpClient = new UDPClient(unicastPort);
         udpClient.sendDatabase(messageBytes);
     }
     
     public void sendExit(UserInformation userInformation) throws IOException {   
         ExitMessage exitMessage = new ExitMessage(userInformation);
-        byte[] messageBytes = serialize_object(exitMessage);
+        byte[] messageBytes = ObjectSerializer.serialize_object(exitMessage);
         
         outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
         socket.send(outPacket);
@@ -82,30 +68,30 @@ public class MessageSender {
     
     
     public void sendBuy(BuyMessage buyMessage, int unicastPort) throws IOException {
-        byte[] messageBytes = serialize_object(buyMessage);
+        byte[] messageBytes = ObjectSerializer.serialize_object(buyMessage);
         UDPClient udpClient = new UDPClient(unicastPort);
         udpClient.sendDatabase(messageBytes);
     }
     
     public void sendTransaction(BuyMessage buyMessage, Wallet wallet) throws IOException {
-        byte[] serializedBuyMessage = serialize_object(buyMessage);
+        byte[] serializedBuyMessage = ObjectSerializer.serialize_object(buyMessage);
         byte[] signedMessage = wallet.signFile(serializedBuyMessage);
         String uniqueId = UUID.randomUUID().toString();
         TransactionMessage transactionMessage = new TransactionMessage(uniqueId, serializedBuyMessage, signedMessage);
-        byte[] messageBytes = serialize_object(transactionMessage);
+        byte[] messageBytes = ObjectSerializer.serialize_object(transactionMessage);
         outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
         socket.send(outPacket);
     }
 
     public void updateDatabase(Database database) throws IOException {        
-        byte[] messageBytes = serialize_object(database);
+        byte[] messageBytes = ObjectSerializer.serialize_object(database);
         
         outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
         socket.send(outPacket);
     }
     
     public void sendMining(MiningMessage miningMessage) throws IOException {        
-        byte[] messageBytes = serialize_object(miningMessage);
+        byte[] messageBytes = ObjectSerializer.serialize_object(miningMessage);
         
         outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
         socket.send(outPacket);

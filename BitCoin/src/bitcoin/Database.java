@@ -19,6 +19,7 @@ public class Database implements Serializable {
     private ArrayList <MiningMessage> arrayTransactions;
     private int numberOfUsers;
     private int numberOfTransactions;
+    private UserInformation myUserInformation;
     
     public Database() {
         this.arrayUserInformation = new ArrayList<>();
@@ -90,6 +91,14 @@ public class Database implements Serializable {
         for (int i=0; i < arrayUserInformation.size(); i++){
             System.out.println(arrayUserInformation.get(i).getUsername());
         }    
+    }
+    
+    public void setMyUserInformation(UserInformation myUserInformation) {
+        this.myUserInformation = myUserInformation;
+    }
+    
+    public UserInformation getMyUserInformation() {
+        return myUserInformation;
     }
 
 }

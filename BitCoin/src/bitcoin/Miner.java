@@ -6,7 +6,6 @@
 package bitcoin;
 
 import bitcoin.peerClient.MessageSender;
-import static bitcoin.peerServer.MessageHandler.deserialize_object;
 import bitcoin.messages.BuyMessage;
 import bitcoin.messages.MiningMessage;
 import bitcoin.messages.TransactionMessage;
@@ -64,7 +63,7 @@ public class Miner extends Thread {
         byte[] encryptedBuyMessage = transactionMessage.getEncryptedBuyMessage();
         byte[] serializedBuyMessage = transactionMessage.getSerializedBuyMessage();
         
-        BuyMessage buyMessage = (BuyMessage) deserialize_object(serializedBuyMessage);
+        BuyMessage buyMessage = (BuyMessage) ObjectSerializer.deserialize_object(serializedBuyMessage);
         String buyerUsername = buyMessage.getBuyerUsername();
         String sellerUsername = buyMessage.getSellerUsername();
         int ammount = buyMessage.getCoins();

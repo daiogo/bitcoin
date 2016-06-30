@@ -31,7 +31,7 @@ public class DebugThread extends Thread{
                     break;
                 case "update":
                     System.out.println("Debug command: UpdateTable"); 
-                    myPeer.updateDatabaseTable();
+                    //myPeer.updateDatabaseTable();
                     break;
             }
         }
