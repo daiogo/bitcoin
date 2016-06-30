@@ -114,7 +114,8 @@ public class MessageHandler extends Thread {
         Miner miner = new Miner(transactionMessage, myPeer);
         miner.start();
     }
-
+           
+    // CODE GOES HERE
     public void handleMiningMessage(MiningMessage miningMessage) {
         System.out.println("Received Mining message");
         Database database = myPeer.getDatabase();

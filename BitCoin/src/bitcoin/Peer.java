@@ -26,6 +26,7 @@ public class Peer {
     // Peer atributes
     private Wallet wallet;
     private Database database;
+    private Database intermediateDatabase;
     private UserInformation myUserInformation;
     private MessageSender messageSender;
     private MessageListener messageListener;
@@ -54,9 +55,12 @@ public class Peer {
         } else {
             System.out.println("File does not exists");
             this.database = new Database();
+            this.intermediateDatabase = new Database();
             myUserInformation = new UserInformation(username, 100, coinPrice, unicastPort, this.wallet.getPublicKey());
             this.database.addUserInformation(myUserInformation);
             this.database.setMyUserInformation(myUserInformation);
+            this.intermediateDatabase.addUserInformation(myUserInformation);
+            this.intermediateDatabase.setMyUserInformation(myUserInformation);
         }
         
         System.out.println("Peer Constructor: " + myUserInformation.getUsername());
@@ -178,6 +182,7 @@ public class Peer {
             mutex.acquire();
             try {
                 this.database = database;
+                this.intermediateDatabase = database;
                 peerWindow.updateDatabase(database);
                 saveDatabaseToFile();
             } finally {
@@ -194,6 +199,7 @@ public class Peer {
             mutex.acquire();
             try {
                 database.addUserInformation(userInformation);
+                intermediateDatabase.addUserInformation(userInformation);
                 peerWindow.updateDatabase(database);
                 saveDatabaseToFile();
             } finally {
@@ -209,6 +215,7 @@ public class Peer {
             mutex.acquire();
             try {
                 database.removeUserInformation(userInformation);
+                intermediateDatabase.removeUserInformation(userInformation);
                 peerWindow.updateDatabase(database);
                 saveDatabaseToFile();
             } finally {
@@ -255,6 +262,7 @@ public class Peer {
             streamIn = new FileInputStream("./" + username + ".txt");
             objectinputstream = new ObjectInputStream(streamIn);
             database = (Database) objectinputstream.readObject();
+            intermediateDatabase = database;
             System.out.println("File read: "+username + ".txt");
             database.printDatabase();
         } catch (IOException | ClassNotFoundException e) {

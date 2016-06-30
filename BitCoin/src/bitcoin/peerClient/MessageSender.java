@@ -70,7 +70,7 @@ public class MessageSender {
     public void sendBuy(BuyMessage buyMessage, int unicastPort) throws IOException {
         byte[] messageBytes = ObjectSerializer.serialize_object(buyMessage);
         UDPClient udpClient = new UDPClient(unicastPort);
-        udpClient.sendDatabase(messageBytes);
+        udpClient.sendBuy(messageBytes);
     }
     
     public void sendTransaction(BuyMessage buyMessage, Wallet wallet) throws IOException {
@@ -83,7 +83,7 @@ public class MessageSender {
         socket.send(outPacket);
     }
 
-    public void updateDatabase(Database database) throws IOException {        
+    public void updateDatabase(Database database) throws IOException {
         byte[] messageBytes = ObjectSerializer.serialize_object(database);
         
         outPacket = new DatagramPacket(messageBytes, messageBytes.length, group, MULTICAST_PORT);
